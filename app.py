@@ -1,15 +1,18 @@
 import os
-from flask import Flask, render_template
+from authy.api import AuthyApiClient
+from flask import Flask, Response, render_template, request
 from flask.ext.sqlalchemy import SQLAlchemy
 
+import models, forms
 
-ACCOUNT_SID = os.environ.get('TWILIO_ACCOUNT_SID', '')
-AUTH_TOKEN = os.environ.get('TWILIO_AUTH_TOKEN', '')
+
+AUTHY_API_KEY = os.environ.get('AUTHY_API_KEY', '')
 SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL', '')
 
 
 app = Flask(__name__, static_path="")
 db = SQLAlchemy(app)
+authy_api = AuthyApiClient(AUTHY_API_KEY)
 
 
 @app.route('/')
@@ -19,11 +22,23 @@ def home():
 
 @app.route('/user', methods=['POST'])
 def signup():
-    return 'ok'
+    full_name = request.form.get('fullName', '')
+    country_code = request.form.get('countryCode', '')
+    phone = request.form.get('phone', '')
+    email = request.form.get('email', '')
+    password = request.form.get('password', '')
+    authy_user = authy_api.users.create(email, phone, country_code)
+    print authy_user.ok()
+    print authy_user.errors()
+    if authy_user.ok():
+        new_user = models.User(email, password, authy_user.id)
+    return Response('', status=200, mimetype='application/json')
 
 
 @app.route('/session', methods=['POST'])
 def session():
+    email = request.form.get('email', '')
+    password = request.form.get('password', '')
     return 'ok'
 
 
