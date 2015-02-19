@@ -1,6 +1,7 @@
 from flask.ext.login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer
+from itsdangerous import SignatureExpired, BadSignature
 
 from . import app, db
 
@@ -12,11 +13,18 @@ class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
+    full_name = db.Column(db.String(256))
+    country_code = db.Column(db.Integer)
+    phone = db.Column(db.String(30))
     authy_id = db.Column(db.Integer)
 
-    def __init__(self, email, password, authy_id):
+    def __init__(self, email, password, full_name, country_code,
+                 phone, authy_id):
         self.email = email
         self.password = password
+        self.full_name = full_name
+        self.country_code = country_code
+        self.phone = phone
         self.authy_id = authy_id
 
     def generate_api_token(self, expiration=1200):
@@ -28,7 +36,7 @@ class User(UserMixin, db.Model):
     def verify_api_token(token):
         serializer = Serializer(app.config['SECRET_KEY'])
         try:
-            data = s.loads(token)
+            data = serializer.loads(token)
         except SignatureExpired:
             # token is valid but it has expired
             return None
