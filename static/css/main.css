@@ -1,0 +1,43 @@
+html {
+    box-sizing:border-box;
+}
+
+*, *:before, *:after {
+  box-sizing:inherit;
+}
+
+footer {
+    font-size:12px;
+    color:#787878;
+    margin-top:20px;
+    padding-top:20px;
+    text-align:center;
+}
+
+footer i {
+    color:#ff0000;
+}
+
+nav a:focus {
+    text-decoration:none;
+    color:#337ab7;
+}
+
+td {
+    padding:10px;
+}
+
+#main {
+    margin-top:10px;
+}
+
+#messages p {
+    padding:10px;
+    border:1px solid #eee;
+}
+
+#messages i {
+    float:right;
+    margin-left:5px;
+    cursor:pointer;
+}
