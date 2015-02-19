@@ -1,0 +1,19 @@
+{
+    "name": "Authy 2FA with Python and Flask",
+    "description": "A Flask app that demonstrates two factor authentication with the Authy API.",
+    "keywords": [
+        "python",
+        "flask",
+        "2 factor authentication",
+        "2fa"
+    ],
+    "website": "https://www.authy.com",
+    "repository": "https://github.com/",
+    "env": {
+        "AUTHY_API_KEY": {
+            "description": "API key for Authy app.",
+            "value": "xxxxxxxxxxxxxxxxxxxxxxx"
+        }
+    },
+    "success_url": "/"
+}

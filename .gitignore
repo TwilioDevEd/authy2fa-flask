@@ -1,0 +1,11 @@
+*.egg*
+*.py[co]
+*.swp
+*.swo
+.DS_Store
+*~
+*.db
+*.log
+assets
+tmp/
+setenvs.sh
