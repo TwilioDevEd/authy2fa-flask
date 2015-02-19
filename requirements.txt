@@ -1,4 +1,5 @@
 Flask==0.10.1
+authy==2.1.1
 
 # the following requirement is just for Heroku deploy button
 gunicorn==19.2.1
