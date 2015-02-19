@@ -21,8 +21,11 @@ def home():
 def signup():
     if request.method == 'GET':
         if current_user.verify_api_token(request.headers['X-API-TOKEN']):
-            token = current_user.generate_api_token()
-            return jsonify({})
+            return jsonify(current_user.to_json())
+        else:
+            resp = jsonify({'message': 'Invalid username or password.'})
+            resp.status_code = 403
+            return resp
     elif request.method == 'POST':
         full_name = request.form.get('fullName', '')
         country_code = request.form.get('countryCode', '')
@@ -39,7 +42,7 @@ def signup():
             login_user(new_user)
             token = new_user.generate_api_token()
             return jsonify({'token': token.decode('ascii')})
-        return Response('Error', status=500, mimetype='application/json')
+    return Response('Error', status=500, mimetype='application/json')
 
 
 @app.route('/session', methods=['POST', 'DELETE'])
@@ -87,3 +90,4 @@ def resend():
         return jsonify({})
     else:
         return Response('', status=403, mimetype='application/json')
+

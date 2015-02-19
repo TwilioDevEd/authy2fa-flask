@@ -58,6 +58,8 @@ class User(UserMixin, db.Model):
 
     def to_json(self):
         json_user = {
+            'fullName': self.full_name,
+            'phone': str(self.country_code) + ' ' + self.phone,
             'email': self.email,
         }
         return json_user
