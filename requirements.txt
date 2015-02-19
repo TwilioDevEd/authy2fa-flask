@@ -1,4 +1,7 @@
 Flask==0.10.1
+Flask-SQLAlchemy==2.0
+psycopg2==2.6
+
 authy==2.1.1
 
 # the following requirement is just for Heroku deploy button
