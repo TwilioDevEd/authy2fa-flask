@@ -7,9 +7,9 @@ project directory.
 
     heroku create
 
-    heroku config:set SECRET\_KEY='something super secret'
-    heroku config:set AUTHY\_API\_KEY='api key here'
+    heroku config:set SECRET_KEY='something super secret'
+    heroku config:set AUTHY_API_KEY='api key here'
 
     heroku addons:add heroku-postgresql
 
-    heroku run python create\_db.py
+    heroku run python create_db.py
