@@ -10,6 +10,10 @@
     "website": "https://www.authy.com",
     "repository": "https://github.com/",
     "env": {
+        "SECRET_KEY": {
+            "description": "A secret key for the Flask app",
+            "generator": "secret"
+        },
         "AUTHY_API_KEY": {
             "description": "API key for Authy app.",
             "value": "xxxxxxxxxxxxxxxxxxxxxxx"

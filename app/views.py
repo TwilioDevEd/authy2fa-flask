@@ -18,7 +18,7 @@ def home():
 
 
 @app.route('/user', methods=['GET', 'POST'])
-def signup():
+def handle_user():
     if request.method == 'GET':
         if current_user.verify_api_token(request.headers['X-API-TOKEN']):
             return jsonify(current_user.to_json())
