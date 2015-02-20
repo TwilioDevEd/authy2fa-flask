@@ -1,8 +1,7 @@
 Flask==0.10.1
 Flask-SQLAlchemy==2.0
 psycopg2==2.6
-Flask-Login==0.2.11
-Flask-WTF==0.11
+itsdangerous==0.24
 
 authy==2.1.1
 

@@ -1,15 +1,9 @@
-from flask import jsonify, render_template, request, Response
+from flask import jsonify, render_template, request, Response, session
 
-from flask.ext.login import login_user, logout_user, login_required, \
-                            current_user
-
-from . import app, db, models, authy_api, login_manager
+from . import app, authy_api
+from .decorators import auth_token_required
 from .models import User
-
-
-@login_manager.user_loader
-def load_user(userid):
-    return User.query.get(int(userid))
+from .utils import validate_sign_up_form, create_user
 
 
 @app.route('/')
@@ -17,77 +11,66 @@ def home():
     return render_template("index.html")
 
 
-@app.route('/user', methods=['GET', 'POST'])
+@app.route('/user', methods=['GET'])
+@auth_token_required
 def handle_user():
-    if request.method == 'GET':
-        if current_user.verify_api_token(request.headers['X-API-TOKEN']):
-            return jsonify(current_user.to_json())
-        else:
-            resp = jsonify({'message': 'Invalid username or password.'})
-            resp.status_code = 403
-            return resp
-    elif request.method == 'POST':
-        full_name = request.form.get('fullName', '')
-        country_code = request.form.get('countryCode', '')
-        phone = request.form.get('phone', '')
-        email = request.form.get('email', '')
-        password = request.form.get('password', '')
-        authy_user = authy_api.users.create(email, phone, country_code)
-        if authy_user.ok():
-            new_user = User(email, password, full_name,
-                            country_code, phone, authy_user.id)
-            db.session.add(new_user)
-            db.session.commit()
-            db.session.refresh(new_user)
-            login_user(new_user)
-            token = new_user.generate_api_token()
-            return jsonify({'token': token.decode('ascii')})
-    return Response('Error', status=500, mimetype='application/json')
+    user = User.query.get(session['user_id'])
+    return jsonify(user.to_json())
 
 
-@app.route('/session', methods=['POST', 'DELETE'])
-def session():
-    if request.method == 'POST':
-        email = request.form.get('email', '')
-        password = request.form.get('password', '')
-        user = User.query.filter_by(email=email).first()
-        if user is not None and user.verify_password(password):
-            login_user(user)
-            token = user.generate_api_token()
-            sms = authy_api.users.request_sms(user.authy_id)
-            return jsonify({'token': token.decode('ascii')})
-        else:
-            resp = jsonify({'message': 'Invalid username or password.'})
-            resp.status_code = 403
-            return resp
-    elif request.method == 'DELETE':
-        logout_user()
-        return jsonify({})
-    return Response('Error', status=403, mimetype='application/json')
+@app.route('/user', methods=['POST'])
+def sign_up():
+    form_valid, validation_errors = validate_sign_up_form(request.form)
+    if form_valid:
+        user = create_user(request.form)
+        token = user.generate_api_token()
+        session['user_id'] = user.id
+        return jsonify({'token': token.decode('ascii')})
+    else:
+        resp = jsonify({'message': validation_errors})
+        resp.status_code = 409
+        return resp
+
+
+@app.route('/session', methods=['POST'])
+def sign_in():
+    email = request.form.get('email', '')
+    password = request.form.get('password', '')
+    user = User.query.filter_by(email=email).first()
+    if user is not None and user.verify_password(password):
+        token = user.generate_api_token()
+        sms = authy_api.users.request_sms(user.authy_id)
+        return jsonify({'token': token.decode('ascii')})
+    else:
+        resp = jsonify({'message': 'Invalid username or password.'})
+        resp.status_code = 403
+        return resp
+
+
+@app.route('/session', methods=['DELETE'])
+def sign_out():
+    # purge user session
+    session.pop('user_id', None)
+    return jsonify({})
 
 
 @app.route('/session/verify', methods=['POST'])
-@login_required
+@auth_token_required
 def verify():
     user_entered_code = request.form.get('code', None)
     if user_entered_code:
-        verification = authy_api.tokens.verify(current_user.authy_id,
-                                               user_entered_code)
-        if verification.ok():
+        user = User.query.get(session.get('user_id'))
+        verified = authy_api.tokens.verify(user.authy_id, user_entered_code)
+        if verified.ok():
             return jsonify({})
-        else:
-            resp = jsonify({'message': 'Invalid token.'})
-            resp.status_code = 403
-            return resp
-    return Response('', status=403, mimetype='application/json')
+    resp = jsonify({'message': 'Invalid token.'})
+    resp.status_code = 403
+    return resp
 
 
 @app.route('/session/resend', methods=['POST'])
-@login_required
+@auth_token_required
 def resend():
-    if current_user.verify_api_token(request.headers['X-API-TOKEN']):
-        sms = authy_api.users.request_sms(current_user.authy_id)
-        return jsonify({})
-    else:
-        return Response('', status=403, mimetype='application/json')
+    sms = authy_api.users.request_sms(session.get('user_id').authy_id)
+    return jsonify({})
 
