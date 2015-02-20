@@ -1,6 +1,10 @@
 # aquarius-python-flask
 Python / Flask back end for Authy 2FA DevEd example.
 
+Note: The authy client does *not* support Python 3 so this application only 
+runs with Python 2.x.
+
+
 ## Deploying on Heroku
 When deploying manually use the following commands from the root of the
 project directory.
