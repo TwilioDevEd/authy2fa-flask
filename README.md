@@ -13,35 +13,35 @@ Development environment requirements:
 
 1. Create virtualenv.
 
-   virtualenv 2faf
-   source 2faf/bin/activate
+       virtualenv 2faf
+       source 2faf/bin/activate
 
 1. Clone repository at https://github.com/makaimc/aquarius-python-flask
 
-    git clone git@github.com:makaimc/aquarius-python-flask
+        git clone git@github.com:makaimc/aquarius-python-flask
 
 1. Change into the new directory.
 
-    cd aquarius-python-flask
+        cd aquarius-python-flask
 
 1. Install local dependencies.
 
-    pip install -r requirements.txt
+        pip install -r requirements.txt
 
 1. Set environment variables.
 
-    export SECRET_KEY='super secret key'
-    export DATABASE_URL='postgresql://username:password@localhost/2faf'
-    export AUTHY_API_KEY='authyapikey'
+        export SECRET_KEY='super secret key'
+        export DATABASE_URL='postgresql://username:password@localhost/2faf'
+        export AUTHY_API_KEY='authyapikey'
 
 1. Create database and schema.
 
-    createdb 2faf
-    python create_db.py
+        createdb 2faf
+        python create_db.py
 
 1. Run the app.
 
-    python run.py
+        python run.py
 
 1. Open web browser and head to http://localhost:5000/ to see the app.
 
