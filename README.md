@@ -8,8 +8,9 @@ runs with Python 2.x.
 ## Running locally
 Development environment requirements:
 
-1. PostgreSQL with access to create a database such as "2faf"
-1. virtualenv and pip to install dependencies
+* PostgreSQL with access to create a database such as "2faf"
+* Use virtualenv and pip to install dependencies
+
 
 1. Create virtualenv.
 
