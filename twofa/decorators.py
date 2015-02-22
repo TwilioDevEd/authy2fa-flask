@@ -3,7 +3,7 @@ from functools import wraps
 
 from .models import User
 
-def auth_token_required(f):
+def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         user_id = session.get('user_id', None)
@@ -15,3 +15,5 @@ def auth_token_required(f):
         resp.status_code = 403
         return resp
     return decorated_function
+
+

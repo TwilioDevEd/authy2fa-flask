@@ -1,4 +1,4 @@
-from app import app
+from twofa import app
 import os
 
 if __name__ == '__main__':
