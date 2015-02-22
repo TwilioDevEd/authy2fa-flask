@@ -38,6 +38,7 @@ def sign_in():
     password = request.form.get('password', '')
     user = User.query.filter_by(email=email).first()
     if user is not None and user.verify_password(password):
+        session['user_id'] = user.id
         token = user.generate_api_token()
         sms = authy_api.users.request_sms(user.authy_id)
         return jsonify({'token': token.decode('ascii')})
@@ -71,6 +72,7 @@ def verify():
 @app.route('/session/resend', methods=['POST'])
 @auth_token_required
 def resend():
-    sms = authy_api.users.request_sms(session.get('user_id').authy_id)
+    user = User.query.get(session.get('user_id'))
+    sms = authy_api.users.request_sms(user.authy_id)
     return jsonify({})
 

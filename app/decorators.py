@@ -1,4 +1,4 @@
-from flask import request, session
+from flask import request, session, jsonify
 from functools import wraps
 
 from .models import User
