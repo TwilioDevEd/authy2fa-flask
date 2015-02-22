@@ -1,3 +1,3 @@
-from app import db
-from app.models import User
+from twofa import db
+from twofa.models import User
 db.create_all()
