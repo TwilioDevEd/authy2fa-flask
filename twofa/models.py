@@ -32,6 +32,7 @@ class User(db.Model):
 
     @staticmethod
     def verify_api_token(token):
+        print token
         serializer = Serializer(app.config['SECRET_KEY'])
         try:
             data = serializer.loads(token)
