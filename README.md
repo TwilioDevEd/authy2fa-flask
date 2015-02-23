@@ -14,8 +14,8 @@ Development environment requirements:
 
 1. Create virtualenv.
 
-       virtualenv 2faf
-       source 2faf/bin/activate
+        virtualenv 2faf
+        source 2faf/bin/activate
 
 1. Clone repository at https://github.com/makaimc/aquarius-python-flask
 
