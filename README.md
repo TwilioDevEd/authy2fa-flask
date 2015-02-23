@@ -59,3 +59,5 @@ project directory.
     heroku addons:add heroku-postgresql
 
     heroku run python create_db.py
+
+    git push heroku master
