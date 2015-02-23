@@ -22,5 +22,8 @@
     "addons" : [
         "heroku-postgresql"
     ],
+    "scripts": {
+        "postdeploy": "python create_db.py"
+    },
     "success_url": "/"
 }
