@@ -8,7 +8,7 @@
         "2fa"
     ],
     "website": "https://www.authy.com",
-    "repository": "https://github.com/makaimc/aquarius-python-flask",
+    "repository": "https://github.com/TwilioDevEd/authy2fa-flask",
     "env": {
         "SECRET_KEY": {
             "description": "A secret key for the Flask app",
