@@ -1,0 +1,58 @@
+.step(data-title='About the Front End', data-file='twofa/templates/index.html', data-highlight='53-69')
+  :markdown
+    ### About the Front End
+
+    ![2FA Flow Chart Step 1](//s3.amazonaws.com/howtodocs/2fa-flow1.png)
+
+    Our user interface for this example is a [single page application](http://en.wikipedia.org/wiki/Single-page_application) written using [Backbone](http://backbonejs.org/) and [jQuery](http://jquery.com/). The UI logic driving our application is a series of [Backbone Views](http://backbonejs.org/#View) that are set up to respond to click events and form submissions, and navigate to different parts of the UI. Don't worry if you're not familiar with these technologies - understanding the front end is not critical to grasping how the 2FA flow works. 
+
+    It should suffice for you to understand that this single web page will make a series of asynchronous ("Ajax" if you prefer) HTTP requests to our web application. We will create an authenticated `Session`, which will be identified by a unique token that we will include with all of our requests to validate our identity.
+
+    Let's start by looking at the HTML for the login form.
+
+.step(data-title="The Login Form", data-file='twofa/static/app/templates/login.html', data-language='html')
+  :markdown
+    ### The Login Form
+
+    ![2FA Flow Chart Step 2](//s3.amazonaws.com/howtodocs/2fa-flow2.png)
+
+    On this login form, the user will attempt to validate the first "factor" of their identity, which is a password they already know. The user will enter their e-mail address and password in this form, and will send it to our server for validation.
+
+    With a little CSS assist from [Twitter Bootstrap](http://getbootstrap.com/) and [Font Awesome](http://fortawesome.github.io/Font-Awesome/), the login form will look something like this:
+
+    ![The Login Form](//s3.amazonaws.com/howtodocs/2fa-screen-login.png)
+
+.step(data-title="Testing The E-Mail Address and Password", data-file='twofa/views.py', data-highlight='44-57')
+  :markdown
+    ### Testing The E-Mail Address and Password
+
+    ![2FA Flow Chart Step 3](//s3.amazonaws.com/howtodocs/2fa-flow3.png)
+
+    On the server, this is the handler function for the `POST /sessions` route which we requested via Ajax on our login form. Using the `User` model, we first find a user instance with the e-mail address in the POST parameters. If that user exists, we test the password that the user entered against the hashed password to see if it's correct.
+
+    If the e-mail / password combination match, we create an API token that we can then pass back to our front-end app to use in further requests. We also use Authy to send a one-time password to our user via SMS that we will validate in the next step.
+
+
+.step(data-title="The Verification Form", data-file='twofa/static/app/templates/verify.html', data-highlight='35-54')
+  :markdown
+    ### The Verification Form
+
+    ![2FA Flow Chart Step 7](//s3.amazonaws.com/howtodocs/2fa-flow7.png)
+
+    On this form, the user will enter the code that was sent to their mobile phone via SMS. If for some reason they didn't get the code, clicking the "Resend Code" link will initiate an Ajax request to the server which will use Authy to send them a new code.
+
+    The verification form will look something like this to the end user:
+
+    ![The Verification Form](//s3.amazonaws.com/howtodocs/2fa-screen-verify.png)
+
+    Let's see how we verify the code they submitted.
+
+.step(data-title="Validating the Code", data-file='twofa/views.py', data-highlight='68-81')
+  :markdown
+    ### Validating the Code
+
+    ![2FA Flow Chart Step 8](//s3.amazonaws.com/howtodocs/2fa-flow8.png)
+
+    Back in our Flask route handler, we grab the code that was submitted from the form to validate. We then grab the user from the Session using the `user_id` we stored earlier. Finally we call the authy api directly to verify the token that the user submitted.
+
+    And kaboom - just like that our user has securely logged into to our application using two factors of authentification.

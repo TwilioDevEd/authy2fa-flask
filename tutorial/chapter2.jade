@@ -1,0 +1,28 @@
+.step(data-title='What Goes Into a Login System?', data-file='twofa/models.py', data-highlight='')
+  :markdown
+    ### What Goes Into a Login System?
+
+    Authentication and authorization are some of the trickiest concepts to get right in a web application, and implementations vary quite a bit from application to application. But generally speaking, every login system has two concepts to implement:
+
+    * `User` : An individual person using the system
+    * `Session` : A series of authenticated interations a user has with the system
+
+    Flask ships with a Session service that is backed by our database, so all we need to do is create a User model. Let's take a look at that next.
+
+.step(data-title="The User Model", data-file='twofa/models.py')
+  :markdown
+    ### The User Model
+
+    The `User` model is responsible for retaining information about the user, such as their full name, mobile phone number, e-mail address, and password.
+
+    An instance of a `User` can do a variety of things related to authentication. Most notably it can compare a candidate password against a hashed password stored in the database, which is used to complete the password authentication step of our login flow.
+
+    Let's check out the code that actually creates our user models next.
+
+.step(data-title="Creating a User", data-file='twofa/utils.py', data-highlight="26-39")
+  :markdown
+    ### Creating a User
+
+    When we create a new user model in our database, we need to create a [a new Authy user](http://docs.authy.com/#section-9) and obtain a unique ID for that user in their system. We store that ID on our `User` model to tie our app's user and the associated Authy user together.
+
+    Once there is an Authy user ID associated with our user model, we can request that an SMS verification token be sent out to the user's phone during the login process. Let's see how that works next.

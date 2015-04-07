@@ -1,0 +1,5 @@
+{
+    "title": "Two-Factor Authentication with Authy",
+    "repo": "TwilioDevEd/authy2fa-flask",
+    "heroku": true
+}

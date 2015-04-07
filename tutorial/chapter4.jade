@@ -1,0 +1,17 @@
+.step(data-title='Requesting Protected Data', data-file='twofa/decorators.py')
+  :markdown
+    ### Requesting Protected Data
+
+    ![2FA Flow Chart Step 10](//s3.amazonaws.com/howtodocs/2fa-flow10.png)
+
+    Throughout the auth flow we pass an api token back and forth between our front-end app and our Flask app. But we need a way to make sure this token is valid on protected routes.
+
+    Here we have written Flask [decorators](http://flask.pocoo.org/docs/0.10/patterns/viewdecorators/) to both ensure the user has verified their e-mail and password, and to ensure that the 2FA step has been completed. We can use these on all our secure routes to ensure the user is logged in.
+
+.step(data-title="All Done!")
+  :markdown
+    ### All Done!
+
+    We now have a working 2FA login system for our application. By using Authy for this, we are able to take advantage of a mobile application for 2FA and let them handle sending international SMS messages. This enables us to spend more time on the actual business logic for our application.
+
+    We hope you found this tutorial useful - if you have any questions or feedback, please let us know! Send a note to [docs@twilio.com](mailto:docs@twilio.com) to say hi.
