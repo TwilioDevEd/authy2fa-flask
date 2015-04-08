@@ -1,6 +1,6 @@
 .step(data-title='How it Works', data-file='twofa/views.py', data-highlight='')
   :markdown
-    ### How It Works
+    ## How It Works
 
     Adding two-factor authentication (2FA) to your web application can help increase the security of your user's data. [Multi-factor authentication](http://en.wikipedia.org/wiki/Multi-factor_authentication) determines the identity of a user by validating one or more of the following "factors":
 
@@ -16,7 +16,7 @@
 
 .step(data-title="Our App's Dependencies", data-file='requirements.txt')
   :markdown
-    ### Our App's Dependencies
+    ## Our App's Dependencies
 
     As with many Flask apps, our application relies on a number of third party libraries to deliver this application. Some of the notable ones are:
 
@@ -29,7 +29,7 @@
 
 .step(data-title='Application Configuration', data-file='twofa/config.py', data-highlight='')
   :markdown
-    ### Application Configuration
+    ## Application Configuration
 
     In this file, we pull in configuration parameters for our application that are necessary to run the app. Most are pulled in from system environment variables, which is a helpful way to access sensitive values (like API tokens). This prevents us from accidentally checking them in to source control.
 
@@ -48,7 +48,7 @@
 
 .step(data-title='Bootstrapping The Application', data-file='twofa/__init__.py', data-highlight='')
   :markdown
-    ### Bootstrapping The Application
+    ## Bootstrapping The Application
 
     We use this file to launch the Python process for our application. After pulling in external module dependencies, our bootstrap file has three jobs:
 
