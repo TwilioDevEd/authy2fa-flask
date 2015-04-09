@@ -10,7 +10,7 @@
 
     Let's start by looking at the HTML for the login form.
 
-.step(data-title="The Login Form", data-file='twofa/static/app/templates/login.html', data-language='html')
+.step(data-title="The Login Form", data-file='twofa/static/app/templates/login.html')
   :markdown
     ## The Login Form
 
@@ -33,7 +33,7 @@
     If the e-mail / password combination match, we create an API token that we can then pass back to our front-end app to use in further requests. We also use Authy to send a one-time password to our user via SMS that we will validate in the next step.
 
 
-.step(data-title="The Verification Form", data-file='twofa/static/app/templates/verify.html', data-highlight='35-54')
+.step(data-title="The Verification Form", data-file='twofa/static/app/templates/verify.html')
   :markdown
     ## The Verification Form
 
