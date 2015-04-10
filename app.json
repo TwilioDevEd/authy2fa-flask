@@ -1,6 +1,6 @@
 {
-    "name": "Authy 2FA with Python and Flask",
-    "description": "A Flask app that demonstrates two factor authentication with the Authy API.",
+    "name": "Authy 2FA with Flask",
+    "description": "A Flask app for 2FA with Authy",
     "keywords": [
         "python",
         "flask",
