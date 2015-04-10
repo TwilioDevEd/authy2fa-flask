@@ -1,7 +1,8 @@
-# aquarius-python-flask
-Python / Flask back end for Authy 2FA DevEd example.
+# Two-Factor Authentication with Authy
 
-Note: The authy client does *not* support Python 3 so this application only 
+This example application demonstrates how to implement 2FA in a Python Flask application.
+
+*Note:* The authy client does *not* support Python 3 so this application only 
 runs with Python 2.x.
 
 
@@ -48,8 +49,11 @@ Development environment requirements:
 
 
 ## Deploying on Heroku
-When deploying manually use the following commands from the root of the
-project directory.
+Click this button to deploy right now!
+
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/TwilioDevEd/authy2fa-flask)
+
+When deploying manually, use the following commands from the root of the project directory.
 
     heroku create
 
