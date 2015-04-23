@@ -1,5 +1,6 @@
 {
     "title": "Two-Factor Authentication with Authy",
+    "description": "Learn to implement two-factor authentication (2FA) in your web app with Twilio-powered Authy. 2FA helps further secure your users' data by validating more than just a password. This tutorial will show you the code to make it happen.",
     "repo": "TwilioDevEd/authy2fa-flask",
     "heroku": true
 }
