@@ -18,13 +18,13 @@ Development environment requirements:
         virtualenv 2faf
         source 2faf/bin/activate
 
-1. Clone repository at https://github.com/makaimc/aquarius-python-flask
+1. Clone repository at https://github.com/TwilioDevEd/authy2fa-flask
 
-        git clone git@github.com:makaimc/aquarius-python-flask
+        git clone git@github.com:TwilioDevEd/authy2fa-flask
 
 1. Change into the new directory.
 
-        cd aquarius-python-flask
+        cd authy2fa-flask
 
 1. Install local dependencies.
 
