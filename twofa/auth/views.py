@@ -3,6 +3,7 @@ from flask import flash, redirect, render_template, request, session, url_for
 
 from . import auth
 from .forms import LoginForm, SignUpForm, VerifyForm
+from ..decorators import login_required, second_factor_verified
 from ..models import User
 from ..utils import create_user, send_authy_sms_request, verify_authy_token
 
@@ -23,6 +24,8 @@ def sign_up():
     return render_template('signup.html', form=form)
 
 @auth.route('/account')
+@login_required
+@second_factor_verified
 def account():
     user = User.query.get(session['user_id'])
     return render_template('account.html', user=user)
@@ -43,6 +46,7 @@ def log_in():
     return render_template('login.html', form=form)
 
 @auth.route('/verify', methods=['GET', 'POST'])
+@login_required
 def verify():
     form = VerifyForm(request.form)
 
@@ -61,7 +65,7 @@ def verify():
     return render_template('verify.html', form=form)
 
 @auth.route('/resend', methods=['POST'])
-# @login_required
+@login_required
 def resend():
     user = User.query.get(session.get('user_id'))
     send_authy_sms_request(user.authy_id)
@@ -72,6 +76,7 @@ def resend():
 def log_out():
     # purge user session and second factor verification (if exists)
     session.pop('user_id', None)
-    session.pop(request.headers.get('X-API-TOKEN', ''), None)
+    session.pop('verified', None)
+
     flash("You're now logged out! Thanks for visiting.", 'info')
     return redirect(url_for('main.home'))
