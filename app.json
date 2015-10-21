@@ -16,7 +16,7 @@
         },
         "AUTHY_API_KEY": {
             "description": "API key for Authy app.",
-            "value": "xxxxxxxxxxxxxxxxxxxxxxx"
+            "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         }
     },
     "addons" : [

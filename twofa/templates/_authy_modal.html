@@ -1,0 +1,36 @@
+<div class="modal fade" id="authy-modal">
+  <div class='modal-dialog'>
+    <div class="modal-content">
+      <div class='modal-header'>
+        <h4 class='modal-title'>Please Authenticate</h4>
+      </div>
+      <div class='modal-body auth-ot'>
+        <div class='help-block'>
+          <i class="fa fa-spinner fa-pulse"></i> Waiting for OneTouch Approval ...
+        </div>
+      </div>
+      <div class='modal-body auth-token'>
+        <div class='help-block'>
+          <i class="fa fa-mobile"></i> Authy OneTouch not available
+        </div>
+        <p>Please enter your Token</p>
+        <form id="authySmsForm">
+        {# form_tag authy_verify_path id: "authy-sms-form" do #}
+          <div class='form-group'>
+            <label class="col-md-4 control-label" for="token">Authy Token</label>
+            <div class='col-md-6'>
+              <input type="text" name="token" id="authy-token" class="form-control" autocomplete="off" />
+            </div>
+          </div>
+          <a value="Verify" class="btn btn-default" href="#">Cancel</a>
+          <input type="submit" name="commit" value="Verify2" class="btn btn-success" />
+        </form>
+        <hr>
+        <form>
+        {# <%= form_tag authy_send_token_path do %> #}
+          <button type="submit" class="btn">Resend code</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

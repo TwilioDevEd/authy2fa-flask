@@ -1,14 +1,25 @@
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import current_app
 from itsdangerous import JSONWebSignatureSerializer as Serializer
 from itsdangerous import BadSignature
+from werkzeug.security import generate_password_hash, check_password_hash
 
-from . import app, db
+from . import db
 
 class User(db.Model):
     """
-        Represents a single user in the system.
+    Represents a single user in the system.
     """
     __tablename__ = 'users'
+
+    AUTHY_STATUSES = (
+        'unverified',
+        'onetouch',
+        'sms',
+        'token',
+        'approved',
+        'denied'
+    )
+
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(64), unique=True, index=True)
     password_hash = db.Column(db.String(128))
@@ -16,24 +27,26 @@ class User(db.Model):
     country_code = db.Column(db.Integer)
     phone = db.Column(db.String(30))
     authy_id = db.Column(db.Integer)
+    authy_status = db.Column(db.Enum(AUTHY_STATUSES))
 
     def __init__(self, email, password, full_name, country_code,
-                 phone, authy_id):
+                 phone, authy_id, authy_status):
         self.email = email
         self.password = password
         self.full_name = full_name
         self.country_code = country_code
         self.phone = phone
         self.authy_id = authy_id
+        self.authy_status = authy_status
 
     def generate_api_token(self):
-        serializer = Serializer(app.config['SECRET_KEY'])
+        serializer = Serializer(current_app.config['SECRET_KEY'])
         return serializer.dumps({'id': self.id})
 
     @staticmethod
     def verify_api_token(token):
         print token
-        serializer = Serializer(app.config['SECRET_KEY'])
+        serializer = Serializer(current_app.config['SECRET_KEY'])
         try:
             data = serializer.loads(token)
         except BadSignature:
