@@ -27,10 +27,10 @@ class User(db.Model):
     country_code = db.Column(db.Integer)
     phone = db.Column(db.String(30))
     authy_id = db.Column(db.Integer)
-    authy_status = db.Column(db.Enum(AUTHY_STATUSES))
+    authy_status = db.Column(db.Enum(*AUTHY_STATUSES, name='authy_statuses'))
 
     def __init__(self, email, password, full_name, country_code,
-                 phone, authy_id, authy_status):
+                 phone, authy_id, authy_status='unverified'):
         self.email = email
         self.password = password
         self.full_name = full_name

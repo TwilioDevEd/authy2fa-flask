@@ -6,30 +6,26 @@
     Thanks for your interest in signing up! Can you tell us a bit about 
     yourself?
 </p>
-<form id="signupForm">
-    <div class="form-group">
-        <label for="fullName">Tell Us Your Name:</label>
-        <input type="text" class="form-control" id="fullName"
-            placeholder="Malcolm Reynolds">
-    </div>
-    <div class="form-group">
-        <label for="email">Enter Your E-mail Address:</label>
-        <input type="text" class="form-control" id="email" 
-            placeholder="me@mydomain.com">
-    </div>
-    <div class="form-group">
-        <label for="password">Enter a Password:</label>
-        <input type="password" class="form-control" id="password">
-    </div>
-    <div class="form-group">
-        <label for="countryCode">Country Code:</label>
-        <select id="authy-countries"></select>
-    </div>
-    <div class="form-group">
-        <label for="phone">Mobile Phone:</label>
-        <input type="text" class="form-control" id="phone" 
-            placeholder="e.g. 651-222-8888">
-    </div>
-    <button type="submit" class="btn btn-primary">Sign Up</button>
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {% if form.errors %}
+        <p><strong>ERRORS:</strong></p>
+        <ul>
+            {% for field, error in form.errors.items() %}
+                <li><strong>{{ field }}:</strong> {{ ', '.join(error) }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    {% from "_formhelpers.html" import render_field %}
+
+    {{ render_field(form.name, placeholder='Malcolm Reynolds') }}
+    {{ render_field(form.email, placeholder='you@example.com') }}
+    {{ render_field(form.password) }}
+    {{ render_field(form.country_code) }}
+    {{ render_field(form.phone_number) }}
+
+    <input type="submit" class="btn btn-primary btn-lg" value="Sign up">
 </form>
 {% endblock %}
