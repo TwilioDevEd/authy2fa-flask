@@ -37,14 +37,14 @@
   <section id="main" class="container">
     <!-- Nav Bar -->
     <nav class="navbar navbar-default">
-        <a class="navbar-brand" href="#home">2FA with Authy</a>
+        <a class="navbar-brand" href="{{ url_for('main.home') }}">2FA with Authy</a>
         <p id="nav-links" class="navbar-text pull-right">
           {% if session.user_id %}
             Welcome back!
             <a id="logout" href="{{ url_for('auth.log_out') }}">Log Out</a>
           {% else %}
             <a href="{{ url_for('auth.sign_up') }}">Sign Up</a> |
-            <a href="">Log In</a>
+            <a href="{{ url_for('auth.log_in') }}">Log In</a>
           {% endif %}
         </p>
     </nav>

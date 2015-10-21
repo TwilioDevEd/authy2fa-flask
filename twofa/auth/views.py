@@ -2,9 +2,9 @@ from authy import AuthyApiException
 from flask import flash, redirect, render_template, request, session, url_for
 
 from . import auth
-from .forms import SignUpForm
+from .forms import LoginForm, SignUpForm, VerifyForm
 from ..models import User
-from ..utils import create_user
+from ..utils import create_user, send_authy_sms_request, verify_authy_token
 
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
@@ -13,14 +13,12 @@ def sign_up():
     if form.validate_on_submit():
         try:
             user = create_user(form)
-            api_token = user.generate_api_token().decode('ascii')
             session['user_id'] = user.id
-            session[api_token] = True
 
-            return redirect(url_for('account'))
+            return redirect(url_for('auth.account'))
 
         except AuthyApiException:
-            form.errors['Authy API'] = 'Unable to send SMS token at this time'
+            form.errors['Authy API'] = ['Unable to send SMS token at this time']
 
     return render_template('signup.html', form=form)
 
@@ -28,6 +26,47 @@ def sign_up():
 def account():
     user = User.query.get(session['user_id'])
     return render_template('account.html', user=user)
+
+@auth.route('/login', methods=['GET', 'POST'])
+def log_in():
+    form = LoginForm(request.form)
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user is not None and user.verify_password(form.password.data):
+            session['user_id'] = user.id
+            send_authy_sms_request(user.authy_id)
+            return redirect(url_for('auth.verify'))
+        else:
+            form.errors['Invalid credentials'] = ['Invalid username or password']
+
+    return render_template('login.html', form=form)
+
+@auth.route('/verify', methods=['GET', 'POST'])
+def verify():
+    form = VerifyForm(request.form)
+
+    if form.validate_on_submit():
+        user_entered_code = form.verification_code.data
+        user = User.query.get(session['user_id'])
+
+        verified = verify_authy_token(user.authy_id, str(user_entered_code))
+        if verified.ok():
+            session['verified'] = True
+            flash("You're logged in! Thanks for using two factor verification.", 'success')
+            return redirect(url_for('auth.account'))
+        else:
+            form.errors['verification_code'] = ['Code invalid - please try again.']
+
+    return render_template('verify.html', form=form)
+
+@auth.route('/resend', methods=['POST'])
+# @login_required
+def resend():
+    user = User.query.get(session.get('user_id'))
+    send_authy_sms_request(user.authy_id)
+    flash('I just re-sent your verification code - enter it below.', 'info')
+    return redirect(url_for('auth.verify'))
 
 @auth.route('/logout')
 def log_out():

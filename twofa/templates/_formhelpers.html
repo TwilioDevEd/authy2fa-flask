@@ -12,3 +12,14 @@
         {{ field(class_="form-control", **kwargs) }}
     </div>
 {% endmacro %}
+
+{% macro render_errors(form) %}
+    {% if form.errors %}
+        <p><strong>ERRORS:</strong></p>
+        <ul>
+            {% for field, error in form.errors.items() %}
+                <li><strong>{{ field }}:</strong> {{ ', '.join(error) }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+{% endmacro %}

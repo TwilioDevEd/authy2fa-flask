@@ -1,6 +1,4 @@
 from flask import current_app
-from itsdangerous import JSONWebSignatureSerializer as Serializer
-from itsdangerous import BadSignature
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db
@@ -39,20 +37,8 @@ class User(db.Model):
         self.authy_id = authy_id
         self.authy_status = authy_status
 
-    def generate_api_token(self):
-        serializer = Serializer(current_app.config['SECRET_KEY'])
-        return serializer.dumps({'id': self.id})
-
-    @staticmethod
-    def verify_api_token(token):
-        print token
-        serializer = Serializer(current_app.config['SECRET_KEY'])
-        try:
-            data = serializer.loads(token)
-        except BadSignature:
-            # token is invalid
-            return None
-        return User.query.get(data['id'])
+    def __repr__(self):
+        return '<User %r>' % self.email
 
     @property
     def password(self):
@@ -64,14 +50,3 @@ class User(db.Model):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
-
-    def to_json(self):
-        json_user = {
-            'fullName': self.full_name,
-            'phone': str(self.country_code) + ' ' + self.phone,
-            'email': self.email,
-        }
-        return json_user
-
-    def __repr__(self):
-        return '<User %r>' % self.email

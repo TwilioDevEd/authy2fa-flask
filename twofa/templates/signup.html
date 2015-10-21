@@ -9,16 +9,9 @@
 <form method="POST">
     {{ form.hidden_tag() }}
 
-    {% if form.errors %}
-        <p><strong>ERRORS:</strong></p>
-        <ul>
-            {% for field, error in form.errors.items() %}
-                <li><strong>{{ field }}:</strong> {{ ', '.join(error) }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
+    {% from "_formhelpers.html" import render_errors, render_field %}
 
-    {% from "_formhelpers.html" import render_field %}
+    {{ render_errors(form) }}
 
     {{ render_field(form.name, placeholder='Malcolm Reynolds') }}
     {{ render_field(form.email, placeholder='you@example.com') }}

@@ -6,15 +6,22 @@
     We've sent you a one-time password to verify your posession of a mobile
     phone tied to this account. Can you enter the code we sent?
 </p>
-<form id="verifyForm">
-    <div class="form-group">
-        <label for="code">Verification Code:</label>
-        <input type="text" class="form-control" id="code">
-    </div>
-    <button type="submit" class="btn btn-primary">Verify Code</button>
+
+<form method="POST">
+    {{ form.hidden_tag() }}
+
+    {% from "_formhelpers.html" import render_errors, render_field %}
+
+    {{ render_errors(form) }}
+
+    {{ render_field(form.verification_code) }}
+
+    <input type="submit" class="btn btn-primary" value="Verify code">
 </form>
 
-<form>
-    <button type="submit" class="btn">Resend my code!</button>
+<br/>
+
+<form method="POST" action="{{ url_for('auth.resend') }}">
+    <button type="submit" class="btn">Resend my code</button>
 </form>
 {% endblock %}
