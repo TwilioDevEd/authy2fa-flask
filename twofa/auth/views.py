@@ -1,64 +1,101 @@
 from authy import AuthyApiException
-from flask import flash, redirect, render_template, request, session, url_for
+from flask import flash, jsonify, redirect, render_template, request, session, url_for
 
 from . import auth
 from .forms import LoginForm, SignUpForm, VerifyForm
-from ..decorators import login_required, second_factor_verified
+from .. import db
+from ..decorators import login_required
 from ..models import User
 from ..utils import create_user, send_authy_sms_request, verify_authy_token
 
+
 @auth.route('/sign-up', methods=['GET', 'POST'])
 def sign_up():
+    """Powers the new user form"""
     form = SignUpForm(request.form)
 
     if form.validate_on_submit():
         try:
             user = create_user(form)
             session['user_id'] = user.id
+            session['verified'] = True
 
-            return redirect(url_for('auth.account'))
+            return redirect(url_for('main.account'))
 
         except AuthyApiException:
-            form.errors['Authy API'] = ['Unable to send SMS token at this time']
+            form.errors['Authy API'] = ['There was an error creating the Authy user']
 
     return render_template('signup.html', form=form)
 
-@auth.route('/account')
-@login_required
-@second_factor_verified
-def account():
-    user = User.query.get(session['user_id'])
-    return render_template('account.html', user=user)
-
 @auth.route('/login', methods=['GET', 'POST'])
 def log_in():
+    """
+    Powers the main login form.
+
+    - GET requests render the username / password form
+    - POST requests process the form data via an AJAX request triggered in the
+    user's browser
+    """
     form = LoginForm(request.form)
 
     if form.validate_on_submit():
         user = User.query.filter_by(email=form.email.data).first()
         if user is not None and user.verify_password(form.password.data):
             session['user_id'] = user.id
-            send_authy_sms_request(user.authy_id)
-            return redirect(url_for('auth.verify'))
+            one_touch_response = user.send_one_touch_request()
+            return jsonify(one_touch_response)
         else:
-            form.errors['Invalid credentials'] = ['Invalid username or password']
+            # The username and password weren't valid
+            form.errors['Invalid credentials'] = ['The username and password combination you entered are invalid']
 
-    return render_template('login.html', form=form)
+    if request.method == 'POST':
+        # This was an AJAX request, and we should return our form errors as JSON
+        return jsonify({'invalid_credentials': render_template('_login_error.html', form=form)})
+    else:
+        return render_template('login.html', form=form)
+
+@auth.route('/authy/callback')
+def authy_callback():
+    """Authy uses this endpoint to tell us the result of a OneTouch request"""
+    authy_id = request.form['authy_id']
+    user = User.query.filter_by(authy_id=authy_id).one()
+
+    user.authy_status = request.form.get['status']
+    db.session.add(user)
+    db.session.commit()
+
+    if user.authy_status == 'approved':
+        session['verified'] = True
+
+    return ('', 204)
+
+@auth.route('/login/status')
+def login_status():
+    """
+    Used by AJAX requests to check the OneTouch verification status of a user
+    """
+    user = User.query.get(session['user_id'])
+    return user.authy_status
 
 @auth.route('/verify', methods=['GET', 'POST'])
 @login_required
 def verify():
+    """Powers SMS token validation (not using OneTouch)"""
     form = VerifyForm(request.form)
+    user = User.query.get(session['user_id'])
+
+    # Send an SMS token to our user when they GET this page
+    if request.method == 'GET':
+        send_authy_sms_request(user.authy_id)
 
     if form.validate_on_submit():
         user_entered_code = form.verification_code.data
-        user = User.query.get(session['user_id'])
 
         verified = verify_authy_token(user.authy_id, str(user_entered_code))
         if verified.ok():
             session['verified'] = True
             flash("You're logged in! Thanks for using two factor verification.", 'success')
-            return redirect(url_for('auth.account'))
+            return redirect(url_for('main.account'))
         else:
             form.errors['verification_code'] = ['Code invalid - please try again.']
 
@@ -67,6 +104,7 @@ def verify():
 @auth.route('/resend', methods=['POST'])
 @login_required
 def resend():
+    """Resends an SMS verification token to a user"""
     user = User.query.get(session.get('user_id'))
     send_authy_sms_request(user.authy_id)
     flash('I just re-sent your verification code - enter it below.', 'info')
@@ -74,7 +112,7 @@ def resend():
 
 @auth.route('/logout')
 def log_out():
-    # purge user session and second factor verification (if exists)
+    """Log out a user, clearing their session variables"""
     session.pop('user_id', None)
     session.pop('verified', None)
 

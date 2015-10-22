@@ -1,7 +1,10 @@
 from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
+import requests
+
 from . import db
+
 
 class User(db.Model):
     """
@@ -50,3 +53,30 @@ class User(db.Model):
 
     def verify_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+    def send_one_touch_request(self):
+        """Initiates an Authy OneTouch request for this user"""
+        # Importing here to avoid circular dependency
+        from .utils import get_authy_client
+        client = get_authy_client()
+
+        url = '{0}/onetouch/json/users/{1}/approval_requests'.format(client.api_uri, self.authy_id)
+        data = {
+            'api_key': client.api_key,
+            'message': 'Request to log in to Twilio demo app',
+            'details[Email]': self.email,
+            'logos[][res]': 'default',
+            'logos[][url]': 'http://howtodocs.s3.amazonaws.com/twilio-logo.png'
+        }
+        response = requests.post(url, data=data)
+        json_response = response.json()
+
+        if 'approval_request' in json_response:
+            self.authy_status = 'onetouch'
+        else:
+            self.authy_status = 'sms'
+
+        db.session.add(self)
+        db.session.commit()
+
+        return json_response

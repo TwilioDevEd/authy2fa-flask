@@ -7,38 +7,39 @@ $(document).ready(function() {
   });
 
   var attemptOneTouchVerification = function(form) {
-    $.post( "/sessions", form, function(data) {
+    $.post( "/login", form, function(data) {
+      // Check first if we successfully authenticated the username and password
+      if (data.hasOwnProperty('invalid_credentials')) {
+        $('.form-errors').remove();
+        $('#login-form').prepend(data.invalid_credentials);
+        return;
+      }
+
       $('#authy-modal').modal({backdrop:'static'},'show');
       if (data.success) {
         $('.auth-ot').fadeIn();
         checkForOneTouch();
       } else {
-        $('.auth-token').fadeIn();
+        redirectToTokenForm();
       }
     });
   };
 
   var checkForOneTouch = function() {
-    $.get( "/authy/status", function(data) {
+    $.get( "/login/status", function(data) {
+      console.log(data);
       
       if (data == 'approved') {
         window.location.href = "/account";
       } else if (data == 'denied') {
-        showTokenForm();
-        triggerSMSToken();
+        redirectToTokenForm();
       } else {
         setTimeout(checkForOneTouch, 2000);
       }
     });
   };
 
-  var showTokenForm = function() {
-    $('.auth-ot').fadeOut(function() {
-      $('.auth-token').fadeIn('slow');
-    });
-  };
-
-  var triggerSMSToken = function() {
-    $.get("/authy/send_token");
+  var redirectToTokenForm = function() {
+    window.location.href = "/verify";
   };
 });

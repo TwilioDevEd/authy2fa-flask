@@ -1,5 +1,6 @@
 import os
 
+
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'not-so-secret')
     AUTHY_API_KEY = os.environ.get('AUTHY_API_KEY')

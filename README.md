@@ -2,7 +2,7 @@
 
 This example application demonstrates how to implement 2FA in a Python Flask application.
 
-*Note:* The authy client does *not* support Python 3 so this application only 
+*Note:* The Authy client does *not* support Python 3 so this application only
 runs with Python 2.x.
 
 

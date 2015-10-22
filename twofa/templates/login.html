@@ -7,7 +7,7 @@
     Be a pal and confirm your username and password, would you?
 </p>
 
-<form method="POST">
+<form method="POST" id="login-form">
     {{ form.hidden_tag() }}
 
     {% from "_formhelpers.html" import render_errors, render_field %}
@@ -19,8 +19,11 @@
 
     <input type="submit" class="btn btn-primary btn-lg" value="Log in">
 </form>
+
+{% include "_authy_modal.html" %}
+
 {% endblock %}
 
-{% block page_js %}
+{% block page_scripts %}
 <script src="{{ url_for('static', filename='js/sessions.js') }}"></script>
 {% endblock %}

@@ -3,6 +3,7 @@ from functools import wraps
 
 from .models import User
 
+
 def login_required(f):
     """Redirects requests to /login if the user isn't authenticated"""
     @wraps(f)
@@ -18,13 +19,13 @@ def login_required(f):
     return decorated_function
 
 
-def second_factor_verified(f):
+def login_verified(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         verified = session.get('verified', False)
         if verified:
             return f(*args, **kwargs)
 
-        flash('You must verify your login before accessing that page.', 'info')
-        return redirect(url_for('auth.verify'))
+        flash('You must complete your login before accessing that page.', 'info')
+        return redirect(url_for('auth.log_in'))
     return decorated_function

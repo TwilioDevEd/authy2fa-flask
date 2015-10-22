@@ -10,6 +10,7 @@ def get_authy_client():
     return AuthyApiClient(current_app.config['AUTHY_API_KEY'])
 
 def create_user(form):
+    """Creates an Authy user and then creates a database User"""
     client = get_authy_client()
 
     authy_user = client.users.create(form.email.data,
@@ -30,7 +31,7 @@ def send_authy_sms_request(authy_user_id):
     """
     client = get_authy_client()
 
-    client.users.request_sms(authy_user_id)
+    client.users.request_sms(authy_user_id, {'force': True})
 
 def verify_authy_token(authy_user_id, user_entered_code):
     """Verifies a user-entered token with Authy"""
