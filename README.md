@@ -5,9 +5,6 @@ in a Python Flask application using [Authy OneTouch](https://www.authy.com/devel
 
 **Full Tutorial:** https://www.twilio.com/docs/howto/walkthrough/two-factor-authentication/python/flask
 
-*Note:* The Authy client does *not* support Python 3 so this application only
-runs with Python 2.x.
-
 ## Quickstart
 
 ### Create an Authy app
