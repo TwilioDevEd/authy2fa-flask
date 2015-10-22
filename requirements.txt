@@ -1,13 +1,20 @@
+# Requirements for authy2fa-flask
+
+# Flask + assorted extensions
 Flask==0.10.1
 Flask-Bootstrap==3.3.5.6
 Flask-Migrate==1.6.0
 Flask-Script==2.0.5
 Flask-SQLAlchemy==2.0
 Flask-WTF==0.12
+
+# Other libraries
+authy==2.1.2
 psycopg2==2.6.1
 requests==2.8.1
 
-authy==2.1.2
-
-# the following requirement is just for Heroku deploy button
+# Production server
 gunicorn==19.3.0
+
+# Testing
+coverage==4.0.1
