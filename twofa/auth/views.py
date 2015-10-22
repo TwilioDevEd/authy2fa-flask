@@ -4,7 +4,7 @@ from flask import flash, jsonify, redirect, render_template, request, session, u
 from . import auth
 from .forms import LoginForm, SignUpForm, VerifyForm
 from .. import db
-from ..decorators import login_required
+from ..decorators import login_required, verify_authy_request
 from ..models import User
 from ..utils import create_user, send_authy_sms_request, verify_authy_token
 
@@ -54,7 +54,8 @@ def log_in():
     else:
         return render_template('login.html', form=form)
 
-@auth.route('/authy/callback')
+@auth.route('/authy/callback', methods=['POST'])
+@verify_authy_request
 def authy_callback():
     """Authy uses this endpoint to tell us the result of a OneTouch request"""
     authy_id = request.form['authy_id']
