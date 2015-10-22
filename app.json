@@ -15,7 +15,7 @@
             "generator": "secret"
         },
         "AUTHY_API_KEY": {
-            "description": "API key for Authy app.",
+            "description": "Your Authy API key",
             "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         }
     },
