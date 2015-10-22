@@ -18,24 +18,14 @@ already and then connect it to your Twilio account.
 
 To get up and running quickly, you can deploy this app for free using Heroku:
 
-<<<<<<< HEAD
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/TwilioDevEd/authy2fa-flask)
 
 ### Local development
-=======
-1. Clone repository at https://github.com/TwilioDevEd/authy2fa-flask
-
-        git clone git@github.com:TwilioDevEd/authy2fa-flask
->>>>>>> origin/master
 
 This project is built using the [Flask](http://flask.pocoo.org/) web framework.
 For now, it only runs on Python 2.7 (not 3.4+).
 
-<<<<<<< HEAD
 To run the app locally, first clone this repository and `cd` into its directory. Then:
-=======
-        cd authy2fa-flask
->>>>>>> origin/master
 
 1. Create a new virtual environment:
     - If using vanilla [virtualenv](https://virtualenv.pypa.io/en/latest/):
@@ -83,7 +73,7 @@ To actually process OneTouch authentication requests, your development server wi
 
 You can run the tests locally through [coverage](http://coverage.readthedocs.org/):
 
-1. Create the test database with either `CREATE DATABASE 2fa_flask_test;` or `createdb 2fa_flask_test`
+1. Optionally create a separate test database and update your `DATABASE_URL` environment variable if you don't want your development data overwritten
 
 1. Run the tests:
 
