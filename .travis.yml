@@ -1,13 +1,13 @@
 language: python
 python:
   - '2.7'
-  - '3.3'
-  - '3.4'
 install:
   - pip install -r requirements.txt
   - pip install coveralls
-script: coverage run manage.py test --settings=twilio_sample_project.settings.test
+before_script:
+  - psql -c 'create database 2fa_flask_test;' -U postgres
+script: coverage run manage.py test
 env:
-  - TWILIO_ACCOUNT_SID=ACXXXXXXXXXXXXXXXXX TWILIO_AUTH_TOKEN=YYYYYYYYYYYYYYYYYY TWILIO_NUMBER=+15555555555 TWIML_APPLICATION_SID=APZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ
+  - SECRET_KEY=not-so-secret DATABASE_URL=postgresql://postgres@localhost/2fa_flask export AUTHY_API_KEY=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 after_success:
   - coveralls
