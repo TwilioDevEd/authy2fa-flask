@@ -1,67 +1,84 @@
-# Two-Factor Authentication with Authy
+# Two-Factor Authentication with Authy OneTouch
 
-This example application demonstrates how to implement 2FA in a Python Flask application.
+This example application demonstrates how to implement Two-Factor Authentication
+in a Python Flask application using [Authy OneTouch](https://www.authy.com/developers/).
 
-*Note:* The authy client does *not* support Python 3 so this application only 
-runs with Python 2.x.
+**Full Tutorial:** https://www.twilio.com/docs/howto/walkthrough/two-factor-authentication/python/flask
 
+## Quickstart
 
-## Running locally
-Development environment requirements:
+### Create an Authy app
 
-* PostgreSQL with access to create a database such as "2faf"
-* Use virtualenv and pip to install dependencies
+Create a free [Authy account](https://www.authy.com/developers/) if you haven't
+already and then connect it to your Twilio account.
 
+*NEED TO ADD MORE INSTRUCTIONS HERE*
 
-1. Create virtualenv.
+### Deploying on Heroku
 
-        virtualenv 2faf
-        source 2faf/bin/activate
-
-1. Clone repository at https://github.com/makaimc/aquarius-python-flask
-
-        git clone git@github.com:makaimc/aquarius-python-flask
-
-1. Change into the new directory.
-
-        cd aquarius-python-flask
-
-1. Install local dependencies.
-
-        pip install -r requirements.txt
-
-1. Set environment variables.
-
-        export SECRET_KEY='super secret key'
-        export DATABASE_URL='postgresql://username:password@localhost/2faf'
-        export AUTHY_API_KEY='authyapikey'
-
-1. Create database and schema.
-
-        createdb 2faf
-        python create_db.py
-
-1. Run the app.
-
-        python run.py
-
-1. Open web browser and head to http://localhost:5000/ to see the app.
-
-
-## Deploying on Heroku
-Click this button to deploy right now!
+To get up and running quickly, you can deploy this app for free using Heroku:
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/TwilioDevEd/authy2fa-flask)
 
-When deploying manually, use the following commands from the root of the project directory.
+### Local development
 
-    heroku create
+This project is built using the [Flask](http://flask.pocoo.org/) web framework.
+For now, it only runs on Python 2.7 (not 3.4+).
 
-    heroku config:set SECRET_KEY='something super secret'
-    heroku config:set AUTHY_API_KEY='api key here'
+To run the app locally, first clone this repository and `cd` into its directory. Then:
 
-    heroku addons:add heroku-postgresql
+1. Create a new virtual environment:
+    - If using vanilla [virtualenv](https://virtualenv.pypa.io/en/latest/):
 
-    git push heroku master
+        ```
+        virtualenv venv
+        source venv/bin/activate
+        ```
 
-    heroku run python create_db.py
+    - If using [virtualenvwrapper](https://virtualenvwrapper.readthedocs.org/en/latest/):
+
+        ```
+        mkvirtualenv authy2fa-flask
+        ```
+
+1. Install the requirements:
+
+    ```
+    pip install -r requirements.txt
+    ```
+
+1. Copy the `.env_example` file to `.env`, and edit it to include your [Authy API key](https://dashboard.authy.com)
+
+1. Run `source .env` to apply the environment variables (or even better, use [autoenv](https://github.com/kennethreitz/autoenv))
+
+1. Start a local PostgreSQL database and create a database called `2fa_flask`:
+    - If on a Mac, we recommend [Postgres.app](http://postgresapp.com/). After install, open psql and run `CREATE DATABASE 2fa_flask;`
+    - If Postgres is already installed locally, you can just run `createdb 2fa_flask` from a terminal
+
+1. Run the migrations with:
+
+    ```
+    python manage.py db upgrade
+    ```
+
+1. Start the development server
+
+    ```
+    python manage.py runserver
+    ```
+
+To actually process OneTouch authentication requests, your development server will need to be publicly accessible. [We recommend using ngrok to solve this problem](https://www.twilio.com/blog/2015/09/6-awesome-reasons-to-use-ngrok-when-testing-webhooks.html).
+
+## Run the tests
+
+You can run the tests locally through [coverage](http://coverage.readthedocs.org/):
+
+1. Optionally create a separate test database and update your `DATABASE_URL` environment variable if you don't want your development data overwritten
+
+1. Run the tests:
+
+    ```
+    $ coverage run manage.py test
+    ```
+
+You can then view the results with `coverage report` or build an HTML report with `coverage html`.

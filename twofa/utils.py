@@ -1,39 +1,40 @@
-from . import db, authy_api
+from authy.api import AuthyApiClient
+from flask import current_app
+
+from . import db
 from .models import User
 
 
-def _validate_field(form, field_name, field_label, errors):
-    field = form.get(field_name, None)
-    if not field:
-        errors.append("{0} is required.".format(field_label))
-
-
-def validate_sign_up_form(form):
-    errors = []
-    _validate_field(form, 'fullName', 'Full name', errors)
-    _validate_field(form, 'email', 'Email', errors)
-    _validate_field(form, 'password', 'Password', errors)
-    _validate_field(form, 'countryCode', 'Country code', errors)
-    _validate_field(form, 'phone', 'Phone number', errors)
-    # finally, check if email already taken
-    if User.query.filter_by(email=form.get('email', '')).count() > 0:
-        errors.append("Email address already taken.")
-    if not errors:
-        return True, ""
-    return False, ' '.join(errors)
-
+def get_authy_client():
+    """Returns an AuthyApiClient"""
+    return AuthyApiClient(current_app.config['AUTHY_API_KEY'])
 
 def create_user(form):
-    full_name = form.get('fullName', '')
-    country_code = form.get('countryCode', '')
-    phone = form.get('phone', '')
-    email = form.get('email', '')
-    password = form.get('password', '')
-    authy_user = authy_api.users.create(email, phone, country_code)
+    """Creates an Authy user and then creates a database User"""
+    client = get_authy_client()
+
+    authy_user = client.users.create(form.email.data,
+                                           form.phone_number.data,
+                                           form.country_code.data)
     if authy_user.ok():
-        user = User(email, password, full_name, country_code, phone,
+        user = User(form.email.data, form.password.data, form.name.data,
+                    form.country_code.data, form.phone_number.data,
                     authy_user.id)
         db.session.add(user)
         db.session.commit()
         db.session.refresh(user)
     return user
+
+def send_authy_sms_request(authy_user_id):
+    """
+    Sends a request to Authy to send a SMS verification code to a user's phone
+    """
+    client = get_authy_client()
+
+    client.users.request_sms(authy_user_id, {'force': True})
+
+def verify_authy_token(authy_user_id, user_entered_code):
+    """Verifies a user-entered token with Authy"""
+    client = get_authy_client()
+
+    return client.tokens.verify(authy_user_id, user_entered_code)
