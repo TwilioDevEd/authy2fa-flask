@@ -39,7 +39,7 @@
     <nav class="navbar navbar-default">
         <a class="navbar-brand" href="{{ url_for('main.home') }}">2FA with Authy</a>
         <p id="nav-links" class="navbar-text pull-right">
-          {% if session.user_id and session.verified %}
+          {% if session.user_id %}
             Welcome back!
             <a id="logout" href="{{ url_for('auth.log_out') }}">Log Out</a>
           {% else %}

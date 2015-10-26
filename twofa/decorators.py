@@ -31,9 +31,11 @@ def login_verified(f):
     """
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        verified = session.get('verified', False)
-        if verified:
-            return f(*args, **kwargs)
+        user_id = session.get('user_id', False)
+        if user_id:
+            user = User.query.filter_by(id=user_id).one_or_none()
+            if user is not None and user.authy_status == 'approved':
+                return f(*args, **kwargs)
 
         flash('You must complete your login before accessing that page.', 'info')
         return redirect(url_for('auth.log_in'))

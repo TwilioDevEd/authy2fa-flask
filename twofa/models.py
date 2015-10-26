@@ -31,7 +31,7 @@ class User(db.Model):
     authy_status = db.Column(db.Enum(*AUTHY_STATUSES, name='authy_statuses'))
 
     def __init__(self, email, password, full_name, country_code,
-                 phone, authy_id, authy_status='unverified'):
+                 phone, authy_id, authy_status='approved'):
         self.email = email
         self.password = password
         self.full_name = full_name

@@ -1,7 +1,7 @@
 from flask import render_template, session
 
 from . import main
-from ..decorators import login_required, login_verified
+from ..decorators import login_verified
 from ..models import User
 
 
@@ -10,7 +10,6 @@ def home():
     return render_template("index.html")
 
 @main.route('/account')
-@login_required
 @login_verified
 def account():
     """A sample user account page. Only accessible to logged in users"""

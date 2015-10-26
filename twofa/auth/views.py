@@ -18,7 +18,6 @@ def sign_up():
         try:
             user = create_user(form)
             session['user_id'] = user.id
-            session['verified'] = True
 
             return redirect(url_for('main.account'))
 
@@ -92,7 +91,10 @@ def verify():
 
         verified = verify_authy_token(user.authy_id, str(user_entered_code))
         if verified.ok():
-            session['verified'] = True
+            user.authy_status = 'approved'
+            db.session.add(user)
+            db.session.commit()
+
             flash("You're logged in! Thanks for using two factor verification.", 'success')
             return redirect(url_for('main.account'))
         else:
@@ -113,7 +115,6 @@ def resend():
 def log_out():
     """Log out a user, clearing their session variables"""
     session.pop('user_id', None)
-    session.pop('verified', None)
 
     flash("You're now logged out! Thanks for visiting.", 'info')
     return redirect(url_for('main.home'))
