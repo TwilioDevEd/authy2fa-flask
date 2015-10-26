@@ -27,7 +27,6 @@ $(document).ready(function() {
 
   var checkForOneTouch = function() {
     $.get( "/login/status", function(data) {
-      console.log(data);
       
       if (data == 'approved') {
         window.location.href = "/account";
