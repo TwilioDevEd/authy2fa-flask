@@ -1,11 +1,10 @@
-from collections import OrderedDict
 from flask import abort, current_app, flash, redirect, request, session, url_for
 from functools import wraps
-from urllib import quote
+from urllib import quote_plus
 
-import copy
 import hmac
 import hashlib
+import json
 import base64
 
 from .models import User
@@ -26,6 +25,10 @@ def login_required(f):
     return decorated_function
 
 def login_verified(f):
+    """
+    Redirects requests if the current user has not verified their login with
+    Authy
+    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         verified = session.get('verified', False)
@@ -35,8 +38,6 @@ def login_verified(f):
         flash('You must complete your login before accessing that page.', 'info')
         return redirect(url_for('auth.log_in'))
     return decorated_function
-
-# 'approval_request[expiration_timestamp]=1445713508&approval_request[logos]=&approval_request[transaction][created_at_time]=1445627108&approval_request[transaction][customer_uuid]=5ccf0040-ed25-0132-5987-0e67b818e6fb&approval_request[transaction][details][Email+Address]=jarodreyes+test13@gmail.com&approval_request[transaction][device_details]=&approval_request[transaction][device_geolocation]=&approval_request[transaction][device_signing_time]=0&approval_request[transaction][encrypted]=false&approval_request[transaction][flagged]=false&approval_request[transaction][message]=Request+to+Login+to+Twilio+demo+app&approval_request[transaction][reason]=&approval_request[transaction][requester_details]=&approval_request[transaction][status]=approved&approval_request[transaction][uuid]=e6afff60-5be6-0133-766e-0e67b818e6fb&authy_id=5588010&callback_action=approval_request_status&device_uuid=5c56ece0-5406-0133-7210-0e67b818e6fb&signature=N/mUjlBcRtIaLnFjF4kLgtQLtWmmK4FgtA8QXiHqjy9lroRUUbPfPXsEYrXyC5MA8VWKoEiU7euHacRcxrQ10utfO2ATYL/TwSdigys9ngkB3sxz7dndDM5BzS9ih/Fn2x+LziNhykTaGS4ceC7L7nB0F5Rc13gyvje9Tqiee0sWeJB9FvVWi3Qk8d7vbXqCBwPcxS4Ru8F9CipvUPQZUlHy4T710kz8fNZlnTOhWsPs2fDk0Adpecr185NWJRt5OSIpHEJLc6ztkyXkMpmhvqE8IS+OUPY25YbQt+kSzxNgRbatv/lbfk0FdHcqiSV10qKFW3F8AeozDo3bF/d9dQ==&status=approved&uuid=e6afff60-5be6-0133-766e-0e67b818e6fb'
 
 def sort_dict(original, parent_path=''):
     """Transforms a dict into the format Authy requires"""
@@ -52,9 +53,18 @@ def sort_dict(original, parent_path=''):
 
         # If the value is a dict, then recurse over that
         if isinstance(value, dict):
-            flattened_item = sort_dict(value, flattened_key)
+            # If the dict is empty, skip this value
+            if not value:
+                continue
+            else:
+                flattened_item = sort_dict(value, flattened_key)
         else:
-            flattened_item = '{0}={1}'.format(flattened_key, value)
+            if value is None:
+                encoded_value = ''
+            else:
+                encoded_value = quote_plus(json.dumps(value).strip('"'))
+
+            flattened_item = '{0}={1}'.format(flattened_key, encoded_value)
 
         if flattened_dict:
             flattened_dict += '&' + flattened_item
@@ -77,7 +87,7 @@ def verify_authy_request(f):
         # Get a string that concatenates all the POST data in case-sensitive
         # order by key
         sorted_data = sort_dict(request.json)
-        encoded_data = quote(sorted_data)
+        encoded_data = quote_plus(sorted_data, safe='/=+&%')
 
         # Concatenate the url and the sorted parameters
         data = nonce + '|' + request.method + '|' + url + '|' + encoded_data
@@ -92,8 +102,6 @@ def verify_authy_request(f):
         # Confirm that our digest_in_base64 matches the one in the request's
         # X-Authy-Signature header
         authy_signature = request.headers['X-Authy-Signature']
-
-        import pdb; pdb.set_trace()
 
         if digest_in_base64 == authy_signature:
             # The two signatures match - this request is authentic

@@ -15,8 +15,8 @@ $(document).ready(function() {
         return;
       }
 
-      $('#authy-modal').modal({backdrop:'static'},'show');
       if (data.success) {
+        $('#authy-modal').modal({backdrop:'static'},'show');
         $('.auth-ot').fadeIn();
         checkForOneTouch();
       } else {

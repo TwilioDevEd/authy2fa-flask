@@ -43,6 +43,7 @@ def log_in():
         if user is not None and user.verify_password(form.password.data):
             session['user_id'] = user.id
             one_touch_response = user.send_one_touch_request()
+
             return jsonify(one_touch_response)
         else:
             # The username and password weren't valid
@@ -58,15 +59,12 @@ def log_in():
 @verify_authy_request
 def authy_callback():
     """Authy uses this endpoint to tell us the result of a OneTouch request"""
-    authy_id = request.form['authy_id']
+    authy_id = request.json.get('authy_id')
     user = User.query.filter_by(authy_id=authy_id).one()
 
-    user.authy_status = request.form.get['status']
+    user.authy_status = request.json.get('status')
     db.session.add(user)
     db.session.commit()
-
-    if user.authy_status == 'approved':
-        session['verified'] = True
 
     return ('', 204)
 
