@@ -65,8 +65,8 @@ class User(db.Model):
             'api_key': client.api_key,
             'message': 'Request to log in to Twilio demo app',
             'details[Email]': self.email,
-            'logos[][res]': 'default',
-            'logos[][url]': 'http://howtodocs.s3.amazonaws.com/twilio-logo.png'
+            # 'logos[][res]': 'default',
+            # 'logos[][url]': 'http://howtodocs.s3.amazonaws.com/twilio-logo.png'
         }
         response = requests.post(url, data=data)
         json_response = response.json()
