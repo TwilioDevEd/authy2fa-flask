@@ -1,11 +1,24 @@
-from authy.api import AuthyApiClient
 from flask import Flask
+from flask_bootstrap import Bootstrap
 from flask.ext.sqlalchemy import SQLAlchemy
 
+from config import config
 
-app = Flask(__name__, static_path="")
-app.config.from_object('twofa.config')
-db = SQLAlchemy(app)
-authy_api = AuthyApiClient(app.config['AUTHY_API_KEY'])
+db = SQLAlchemy()
 
-from . import views, models
+
+def create_app(config_name):
+    app = Flask(__name__)
+    app.config.from_object(config[config_name])
+    config[config_name].init_app(app)
+
+    Bootstrap(app)
+    db.init_app(app)
+
+    from .auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint)
+
+    from .main import main as main_blueprint
+    app.register_blueprint(main_blueprint)
+
+    return app
