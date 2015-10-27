@@ -1,28 +1,183 @@
-.step(data-title='What Goes Into a Login System?', data-file='twofa/models.py', data-highlight='')
+.step(data-file='twofa/utils.py', data-highlight='12-32')
   :markdown
-    ## What Goes Into a Login System?
+    ## Registering a User with Authy
 
-    Authentication and authorization are some of the trickiest concepts to get right in a web application, and implementations vary quite a bit from application to application. But generally speaking, every login system has two concepts to implement:
+    When a new user signs up for our website we call this helper function, which 
+    handles saving the user to the database as well as registering the user 
+    with Authy.
 
-    * `User` : An individual person using the system
-    * `Session` : A series of authenticated interations a user has with the system
+    All Authy needs to get a user set up for your application is their email, 
+    phone number and country code. We have fields for each of these on our
+    sign up form.
 
-    Flask ships with a Session service that is backed by our database, so all we need to do is create a User model. Let's take a look at that next.
+    Once we register the user with Authy we can get the user's Authy id off the
+    response. This is very important — it's how we will verify the identity
+    of our user with Authy.
 
-.step(data-title="The User Model", data-file='twofa/models.py')
+    ---
+
+    **See Also:**
+    * [Flask-WTF (form validation) docs](https://flask-wtf.readthedocs.org/en/latest/)
+    * [Flask-SQLAlchemy docs](https://pythonhosted.org/Flask-SQLAlchemy/index.html)
+
+.step(data-file='twofa/auth/views.py', data-highlight='29-57')
   :markdown
-    ## The User Model
+    ## Logging in with Authy OneTouch
 
-    The `User` model is responsible for retaining information about the user, such as their full name, mobile phone number, e-mail address, and password.
+    When a user attempts to log in to our website, we will ask them for a second 
+    form of identification. Let's take a look at OneTouch verification first. 
 
-    An instance of a `User` can do a variety of things related to authentication. Most notably it can compare a candidate password against a hashed password stored in the database, which is used to complete the password authentication step of our login flow.
+    ![Authy OneTouch Approval](//howtodocs.s3.amazonaws.com/onetouch-approved.gif)
 
-    Let's check out the code that actually creates our user models next.
+    OneTouch works like so:
+    * We attempt to send a user a _OneTouch Approval Request_
+    * If the Uuer has OneTouch enabled, we will get a `success` message back
+    * The user hits 'Approve' in their Authy app
+    * Authy makes a POST request to our app with an 'Approved' status
+    * We log the user in
 
-.step(data-title="Creating a User", data-file='twofa/utils.py', data-highlight="26-39")
+    In the next steps we'll look at how we handle this workflow and cases where
+    the user does not have OneTouch or denies the login request.
+
+.step(data-file='twofa/models.py', data-highlight='57-80')
   :markdown
-    ## Creating a User
+    ## Sending the OneTouch Request
 
-    When we create a new user model in our database, we need to create a [a new Authy user](http://docs.authy.com/#section-9) and obtain a unique ID for that user in their system. We store that ID on our `User` model to tie our app's user and the associated Authy user together.
+    When our user logs in we immediately attempt to verify their identity with 
+    OneTouch. We will fall back gracefully if they don't have a OneTouch device, 
+    but we don't know until we try.
 
-    Once there is an Authy user ID associated with our user model, we can request that an SMS verification token be sent out to the user's phone during the login process. Let's see how that works next.
+    Authy lets us pass extra details with our OneTouch request, including a
+    message, a logo and any other details we want to send. We could easily send
+    any number of details by appending `details[some_detail]` to our POST
+    request. You could imagine a scenario where we send a OneTouch request to
+    approve a money transfer:
+
+    ```python
+    data = {
+        'api_key': client.api_key,
+        'message': "Request to send money to Jarod's vault",
+        'details[Request From]': 'Jarod',
+        'details[Amount Requested]': '1,000,000',
+        'details[Currency]': 'Galleons'
+    }
+    ```
+
+    Once we send the request we update our user's `authy_status` based 
+    on the response. This lets us know which method Authy will try first to
+    verify this request with our user.
+
+    --- 
+
+    **See Also:**
+    * [requests library docs](http://docs.python-requests.org/en/latest/)
+
+.step(data-file='twofa/auth/views.py', data-highlight='59-70')
+  :markdown
+    ## Configuring the OneTouch callback
+
+    In order for our app to know what the user did after we sent the OneTouch 
+    request, we need to register a callback endpoint with Authy.
+
+    ![Authy OneTouch Callback](//howtodocs.s3.amazonaws.com/onetouch-callback-endpoint.png)
+
+    *Note: In order to verify that the request is coming from Authy we've
+    written a decorator, `@verify_authy_request` that will halt the request if
+    we cannot verify that it actually came from Authy.*
+
+    Here in our callback, we look up the user using the `authy_id` sent with the
+    Authy POST request. In a production application we might use a websocket
+    to let our client know that we received a response from Authy. For this
+    version, we keep it simple and just update the `authy_status` on the user.
+    Our client-side code will check that field before completing the login.
+
+
+    Let's take a look at that client-side code now.
+
+    --- 
+
+    **See Also:**
+    * SQLAlchemy [filter_by()](http://docs.sqlalchemy.org/en/rel_1_0/orm/query.html#sqlalchemy.orm.query.Query.filter_by) and [one()](http://docs.sqlalchemy.org/en/rel_1_0/orm/query.html#sqlalchemy.orm.query.Query.one)
+
+.step(data-file='twofa/static/js/sessions.js')
+  :markdown
+    ## Handling Two-Factor Asyncronously
+
+    In order for two-factor authentication to be seamless, it is best done 
+    asynchronously so that the user doesn't even know it's happening.
+
+    We've already taken a look at what's happening on the server side, so let's 
+    step in front of the cameras now and see how our JavaScript is interacting 
+    with those server endpoints.
+
+    First we hijack the login form submit and pass the data to our `sessions/create` 
+    controller using Ajax. Depending on how that endpoint responds we will 
+    either wait for a OneTouch respose or ask the user to enter a token.
+
+    If we expect a OneTouch response, we will begin polling `/login/status` until 
+    we see the OneTouch login was either approved or denied. Let's take a 
+    look at this controller and see what is happening.
+
+    --- 
+
+    **See Also:**
+    * [jQuery Post method](//api.jquery.com/jquery.post/)
+    * [Bootstrap modals](//getbootstrap.com/javascript/#modals)
+
+.step(data-file='twofa/auth/views.py', data-highlight='72-78')
+  :markdown
+    ## Falling back to Token
+
+    Here is the endpoint that our javascript is polling. It is waiting for the 
+    user's `authy_status` to be either `approved` or `denied`. If the user
+    approved the OneTouch request, our JavaScript code from the previous step
+    will redirect their browser to their account screen.
+
+    If the OneTouch request was denied we will ask the user to log in with a
+    token instead.
+
+.step(data-file='twofa/auth/views.py', data-highlight='80-105')
+  :markdown
+    ## Sending a Token
+
+    This view is responsible for sending the token and then 
+    validating the code that our user enters.
+
+    In the case where our user already has the Authy app, but is not enabled for 
+    OneTouch this same method will trigger a push notification that will be sent 
+    to their phone, with a code inside the Authy app.
+
+    The user will see a verification form that looks like this:
+
+    ![The Verification Form](//s3.amazonaws.com/howtodocs/2fa-screen-verify.png)
+
+    A POST request to this view validates the code our user enters. First, we
+    grab the `User` model by the ID we stored in the session.  Next, we use the Authy 
+    API to validate the code our user entered against the one Authy sent them.  
+    If the two match, our login process is complete! We mark the user's
+    `authy_status` as `approved` and thank them for using two-factor
+    authentication.
+
+.step
+  :markdown
+    ## Where to next?
+
+    That's it! We've just implemented two-factor auth using three different 
+    methods and the latest in Authy technology.
+
+    If you're a Python developer working with Twilio, you might enjoy these
+    other tutorials:
+
+    [**SMS and MMS Notifications**](//www.twilio.com/docs/howto/walkthrough/server-notifications/python/django)
+
+    Faster than e-mail and less likely to get blocked, text messages are great for timely alerts and notifications. Learn how to send out SMS (and MMS) notifications to a list of server administrators.
+
+    [**Call Tracking**](//www.twilio.com/docs/howto/walkthrough/call-tracking/python/django)
+
+    Call Tracking helps you measure the effectiveness of different marketing campaigns. By assigning a unique phone number to different advertisements, you can track which ones have the best call rates and get some data about the callers themselves.
+
+    ### Did this help?
+
+    Thanks for checking out this tutorial! If you have any feedback to share
+    with us, we'd love to hear it. Tweet
+    [@twilio](http://twitter.com/twilio) to let us know what you think.

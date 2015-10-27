@@ -15,15 +15,15 @@
             "generator": "secret"
         },
         "AUTHY_API_KEY": {
-            "description": "API key for Authy app.",
-            "value": "xxxxxxxxxxxxxxxxxxxxxxx"
+            "description": "Your Authy API key",
+            "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
         }
     },
     "addons" : [
         "heroku-postgresql"
     ],
     "scripts": {
-        "postdeploy": "python create_db.py"
+        "postdeploy": "python manage.py db upgrade"
     },
     "success_url": "/"
 }
