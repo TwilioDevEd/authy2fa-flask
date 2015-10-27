@@ -1,60 +1,57 @@
-.step(data-title='How it Works', data-file='twofa/views.py', data-highlight='')
+.step(data-file='twofa/models.py')
   :markdown
-    ## How It Works
+    ## About this application
 
-    Adding two-factor authentication (2FA) to your web application can help increase the security of your user's data. [Multi-factor authentication](http://en.wikipedia.org/wiki/Multi-factor_authentication) determines the identity of a user by validating one or more of the following "factors":
+    This [Flask](http://flask.pocoo.org/) sample application is an
+      example of typical login flow. To run this sample
+      app yourself, [download the code and follow the instructions on
+      GitHub](https://github.com/TwilioDevEd/authy2fa-flask).
 
-    * _Knowledge Factors_ (Something a user knows, like a password)
-    * _Posession Factors_ (Something a user has, like a mobile phone)
-    * _Inherence Factors_ (Something a user is, like a person with a unique finger print)
+    Adding two-factor authentication (2FA) to your web application increases the 
+    security of your user's data. [Multi-factor authentication](http://en.wikipedia.org/wiki/Multi-factor_authentication) 
+    determines the identity of a user by validating once by logging into the app, 
+    and then a second time with their mobile device using [Authy](https://www.twilio.com/authy).
 
-    We're about to walk you through a sample application that implements a simple login system with a _knowledge factor_ and a _posession factor_. For the knowledge factor, we will use a standard username/password system. For the possession factor, we will validate that the user has their mobile phone by sending them a one-time passcode in a text message [sent with Authy via Twilio](http://www.authy.com/). Here's how this works at a high level:
+    For the second factor, we will validate that the user has their mobile phone by either:
+    * Sending them a OneTouch push notification to their mobile Authy app or
+    * Sending them a token through their mobile Authy app or
+    * Sending them a one-time token in a text message sent with Authy via Twilio.
+
+    Here's how this works at a high level:
 
     ![2FA High Level](//s3.amazonaws.com/howtodocs/2fa-high-level.png)
 
-    Now it's time to look at some code! We'll begin by understanding the moving parts of this example [Python](https://www.python.org/) application before diving into the actual implementation of the login flow.
+    Let's get started! Click the right arrow above to move to the next step
+      of the tutorial.
 
-.step(data-title="Our App's Dependencies", data-file='requirements.txt')
+    ---
+
+    **See Also:**
+    * [Flask documentation](http://flask.pocoo.org/docs/0.10/)
+    * [Authy overview](https://www.twilio.com/authy)
+    * [authy-python helper library](https://github.com/authy/authy-python/)
+
+.step(data-file='twofa/auth/views.py', data-highlight='29-57')
   :markdown
-    ## Our App's Dependencies
+    ## Configuring Authy
 
-    As with many Flask apps, our application relies on a number of third party libraries to deliver this application. Some of the notable ones are:
-
-    * [`flask`](//flask.pocoo.org/) : A microframework for Python
-    * [`sqlalchemy`](//www.sqlalchemy.org/) : Object Relational Mapper that makes working in SQL easier.
-    * [`authy`](https://github.com/authy/authy-python) : A high-level helper library for working with the Authy API
-
-    Let's take a look at how our application is configured next.
-
-
-.step(data-title='Application Configuration', data-file='twofa/config.py', data-highlight='')
-  :markdown
-    ## Application Configuration
-
-    In this file, we pull in configuration parameters for our application that are necessary to run the app. Most are pulled in from system environment variables, which is a helpful way to access sensitive values (like API tokens). This prevents us from accidentally checking them in to source control.
-
-    The configuration parameters we need are:
-
-    * `SECRET_KEY` : Used by our flask app to generate our API key
-    * `AUTHY_API_KEY` : Our key for the authy API - this configuration assumes you will use the "production" token that will actually send out text messages.
-    * `SQLALCHEMY_DATABASE_URI` : A connection string for a sqlalchemy database.
-
-    If you haven't already, now is the time to [sign up for Authy](https://dashboard.authy.com/signup). Create your first application, naming it whatever you wish. After you create your application, your "production" API key will be visible on your [dashboard](https://dashboard.authy.com):
+    If you haven't already, now is the time to [sign up for Authy](https://dashboard.authy.com/signup). 
+    Create your first application, naming it whatever you wish. After you create your application, 
+    your production API key will be visible on your [dashboard](https://dashboard.authy.com):
 
     ![Authy Dashboard](//s3.amazonaws.com/howtodocs/2fa-authy-dashboard.png)
 
-    Next, let's take a look at the Python file we'll use to create and launch our application.
+    Once we have an Authy API key, we store it in this `.env` file, which helps
+    us set the environment variables for our app.
 
+    You'll also want to set a callback URL for your application in the OneTouch
+    section of the Authy dashboard. See the project
+    [README](https://github.com/TwilioDevEd/authy2fa-flask) for more details.
 
-.step(data-title='Bootstrapping The Application', data-file='twofa/__init__.py', data-highlight='')
-  :markdown
-    ## Bootstrapping The Application
+    Now that we've configured our Flask app, let's take a look at how we 
+    register a user with Authy.
 
-    We use this file to launch the Python process for our application. After pulling in external module dependencies, our bootstrap file has three jobs:
+    ---
 
-
-    1. Create and configure a Flask web application (our entire front end app will be a [Backbone](http://backbonejs.org) application served as static files from the `public` directory)
-    1. Connect to our postgres database using SQLAlchemy
-    1. Start our app on port 5000
-
-    Now that we understand the basics of how our application is configured and run, let's back up a bit and talk about the [domain model](http://en.wikipedia.org/wiki/Domain_model) for our application.
+      **See Also:**
+      * [autoenv](https://github.com/kennethreitz/autoenv)
