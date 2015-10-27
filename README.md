@@ -1,5 +1,7 @@
 # Two-Factor Authentication with Authy OneTouch
 
+[![Build Status](https://travis-ci.org/TwilioDevEd/authy2fa-flask.svg?branch=master)](https://travis-ci.org/TwilioDevEd/authy2fa-flask)
+
 This example application demonstrates how to implement Two-Factor Authentication
 in a Python Flask application using [Authy OneTouch](https://www.authy.com/developers/).
 
