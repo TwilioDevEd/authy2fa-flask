@@ -12,7 +12,9 @@ in a Python Flask application using [Authy OneTouch](https://www.authy.com/devel
 Create a free [Authy account](https://www.authy.com/developers/) if you haven't
 already and then connect it to your Twilio account.
 
-*NEED TO ADD MORE INSTRUCTIONS HERE*
+Then create a new Authy application. Be sure to set the OneTouch callback
+endpoint to `http://your-server-here.com/authy/callback` once you've finished
+configuring the app.
 
 ### Deploying on Heroku
 
@@ -68,6 +70,12 @@ To run the app locally, first clone this repository and `cd` into its directory.
     ```
 
 To actually process OneTouch authentication requests, your development server will need to be publicly accessible. [We recommend using ngrok to solve this problem](https://www.twilio.com/blog/2015/09/6-awesome-reasons-to-use-ngrok-when-testing-webhooks.html).
+
+Once you have started ngrok, set your Authy app's OneTouch callback URL to use your ngrok hostname, like this:
+
+```
+http://88b37ada.ngrok.io/authy/callback
+```
 
 ## Run the tests
 
