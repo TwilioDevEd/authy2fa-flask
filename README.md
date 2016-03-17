@@ -2,8 +2,8 @@
 
 [![Build Status](https://travis-ci.org/TwilioDevEd/authy2fa-flask.svg?branch=master)](https://travis-ci.org/TwilioDevEd/authy2fa-flask)
 
-This example application demonstrates how to implement Two-Factor Authentication
-in a Python Flask application using [Authy OneTouch](https://www.authy.com/developers/).
+This application example demonstrates how to implement Two-Factor Authentication
+on a Python Flask application using [Authy OneTouch](https://www.authy.com/developers/).
 
 **Full Tutorial:** https://www.twilio.com/docs/howto/walkthrough/two-factor-authentication/python/flask
 
@@ -12,9 +12,9 @@ in a Python Flask application using [Authy OneTouch](https://www.authy.com/devel
 ### Create an Authy app
 
 Create a free [Authy account](https://www.authy.com/developers/) if you haven't
-already and then connect it to your Twilio account.
+already done so and then connect it to your Twilio account.
 
-Then create a new Authy application. Be sure to set the OneTouch callback
+Create a new Authy application. Be sure to set the OneTouch callback
 endpoint to `http://your-server-here.com/authy/callback` once you've finished
 configuring the app.
 
@@ -27,11 +27,11 @@ To get up and running quickly, you can deploy this app for free using Heroku:
 ### Local development
 
 This project is built using the [Flask](http://flask.pocoo.org/) web framework.
-For now, it only runs on Python 2.7 (not 3.4+).
+For now it only runs on Python 2.7 (not 3.4+).
 
-To run the app locally, first clone this repository and `cd` into its directory. Then:
+1. To run the app locally, first clone this repository and `cd` into it.
 
-1. Create a new virtual environment:
+1. Create a new virtual environment.
     - If using vanilla [virtualenv](https://virtualenv.pypa.io/en/latest/):
 
         ```
@@ -45,7 +45,7 @@ To run the app locally, first clone this repository and `cd` into its directory.
         mkvirtualenv authy2fa-flask
         ```
 
-1. Install the requirements:
+1. Install the requirements.
 
     ```
     pip install -r requirements.txt
@@ -55,8 +55,9 @@ To run the app locally, first clone this repository and `cd` into its directory.
 
 1. Run `source .env` to apply the environment variables (or even better, use [autoenv](https://github.com/kennethreitz/autoenv))
 
-1. Start a local PostgreSQL database and create a database called `2fa_flask`:
-    - If on a Mac, we recommend [Postgres.app](http://postgresapp.com/). After install, open psql and run `CREATE DATABASE 2fa_flask;`
+1. Start a local PostgreSQL database and create a database called `2fa_flask`.
+
+    - If on a Mac, we recommend [Postgres.app](http://postgresapp.com/). After installing it, open psql and run `CREATE DATABASE 2fa_flask;`
     - If Postgres is already installed locally, you can just run `createdb 2fa_flask` from a terminal
 
 1. Run the migrations with:
@@ -85,7 +86,7 @@ You can run the tests locally through [coverage](http://coverage.readthedocs.org
 
 1. Optionally create a separate test database and update your `DATABASE_URL` environment variable if you don't want your development data overwritten
 
-1. Run the tests:
+1. Run the tests.
 
     ```
     $ coverage run manage.py test
