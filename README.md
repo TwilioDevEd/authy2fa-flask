@@ -93,3 +93,8 @@ You can run the tests locally through [coverage](http://coverage.readthedocs.org
     ```
 
 You can then view the results with `coverage report` or build an HTML report with `coverage html`.
+
+---------------
+<a href="http://twilio.com/signal">![](https://s3.amazonaws.com/baugues/signal-logo.png)</a>
+
+Join us in San Francisco May 24-25th to [learn directly from the developers who build Authy](https://www.twilio.com/signal/schedule/2crLXWsVZaA2WIkaCUyYOc/aut). 
