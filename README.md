@@ -1,11 +1,15 @@
+<a href="http://twilio.com/signal">![](https://s3.amazonaws.com/baugues/signal-logo.png)</a>
+
+Join us in San Francisco May 24-25th to [learn directly from the developers who build Authy](https://www.twilio.com/signal/schedule/2crLXWsVZaA2WIkaCUyYOc/aut).
+
 # Two-Factor Authentication with Authy OneTouch
+
+This application example demonstrates how to implement Two-Factor Authentication on a Python Flask application using [Authy OneTouch](https://www.authy.com/developers/).
 
 [![Build Status](https://travis-ci.org/TwilioDevEd/authy2fa-flask.svg?branch=master)](https://travis-ci.org/TwilioDevEd/authy2fa-flask)
 
-This application example demonstrates how to implement Two-Factor Authentication
-on a Python Flask application using [Authy OneTouch](https://www.authy.com/developers/).
 
-**Full Tutorial:** https://www.twilio.com/docs/howto/walkthrough/two-factor-authentication/python/flask
+[Learn more about this code in our interactive code walkthrough](https://www.twilio.com/docs/howto/walkthrough/two-factor-authentication/python/flask).
 
 ## Quickstart
 
@@ -22,7 +26,7 @@ configuring the app.
 
 To get up and running quickly, you can deploy this app for free using Heroku:
 
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy?template=https://github.com/TwilioDevEd/authy2fa-flask)
+[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/TwilioDevEd/authy2fa-flask)
 
 ### Local development
 
@@ -94,7 +98,10 @@ You can run the tests locally through [coverage](http://coverage.readthedocs.org
 
 You can then view the results with `coverage report` or build an HTML report with `coverage html`.
 
----------------
-<a href="http://twilio.com/signal">![](https://s3.amazonaws.com/baugues/signal-logo.png)</a>
+That's it!
 
-Join us in San Francisco May 24-25th to [learn directly from the developers who build Authy](https://www.twilio.com/signal/schedule/2crLXWsVZaA2WIkaCUyYOc/aut). 
+## Meta
+
+* No warranty expressed or implied. Software is as is. Diggity.
+* [MIT License](http://www.opensource.org/licenses/mit-license.html)
+* Lovingly crafted by Twilio Developer Education.
