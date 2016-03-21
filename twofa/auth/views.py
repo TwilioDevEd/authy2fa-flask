@@ -61,11 +61,14 @@ def log_in():
 def authy_callback():
     """Authy uses this endpoint to tell us the result of a OneTouch request"""
     authy_id = request.json.get('authy_id')
-    user = User.query.filter_by(authy_id=authy_id).one()
+    # When you're configuring your Endpoint/URL under OneTouch settings '1234'
+    # is the preset 'authy_id'
+    if authy_id != '1234':
+        user = User.query.filter_by(authy_id=authy_id).one()
 
-    user.authy_status = request.json.get('status')
-    db.session.add(user)
-    db.session.commit()
+        user.authy_status = request.json.get('status')
+        db.session.add(user)
+        db.session.commit()
 
     return ('', 204)
 
