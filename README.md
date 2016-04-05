@@ -24,7 +24,7 @@ configuring the app.
 
 ### Deploying on Heroku
 
-To get up and running quickly, you can deploy this app for free using Heroku:
+To get it up and running quickly, you can deploy this app for free using Heroku:
 
 [![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/TwilioDevEd/authy2fa-flask)
 
@@ -36,6 +36,7 @@ For now it only runs on Python 2.7 (not 3.4+).
 1. To run the app locally, first clone this repository and `cd` into it.
 
 1. Create a new virtual environment.
+
     - If using vanilla [virtualenv](https://virtualenv.pypa.io/en/latest/):
 
         ```
@@ -61,16 +62,17 @@ For now it only runs on Python 2.7 (not 3.4+).
 
 1. Start a local PostgreSQL database and create a database called `2fa_flask`.
 
-    - If on a Mac, we recommend [Postgres.app](http://postgresapp.com/). After installing it, open psql and run `CREATE DATABASE 2fa_flask;`
+    - If on a Mac, we recommend using [Postgres.app](http://postgresapp.com/). After installing it, open psql and run `CREATE DATABASE 2fa_flask;`
+
     - If Postgres is already installed locally, you can just run `createdb 2fa_flask` from a terminal
 
-1. Run the migrations with:
+1. Run the migrations.
 
     ```
     python manage.py db upgrade
     ```
 
-1. Start the development server
+1. Start the development server.
 
     ```
     python manage.py runserver
@@ -88,7 +90,7 @@ http://88b37ada.ngrok.io/authy/callback
 
 You can run the tests locally through [coverage](http://coverage.readthedocs.org/):
 
-1. Optionally create a separate test database and update your `DATABASE_URL` environment variable if you don't want your development data overwritten
+1. Optionally create a separate test database and update your `DATABASE_URL` environment variable if you don't want your development data overwritten.
 
 1. Run the tests.
 
