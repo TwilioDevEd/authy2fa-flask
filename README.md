@@ -18,12 +18,6 @@ Create a new Authy application. Be sure to set the OneTouch callback
 endpoint to `http://your-server-here.com/authy/callback` once you've finished
 configuring the app.
 
-### Deploying on Heroku
-
-To get it up and running quickly, you can deploy this app for free using Heroku:
-
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/TwilioDevEd/authy2fa-flask)
-
 ### Local development
 
 This project is built using the [Flask](http://flask.pocoo.org/) web framework.
