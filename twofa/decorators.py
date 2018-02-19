@@ -1,6 +1,9 @@
 from flask import abort, current_app, flash, redirect, request, session, url_for
 from functools import wraps
-from urllib import quote_plus
+try:
+    from urllib.parse import quote_plus
+except ImportError:
+    from urllib import quote_plus
 
 import hmac
 import hashlib
@@ -24,6 +27,7 @@ def login_required(f):
         return redirect(url_for('auth.log_in'))
     return decorated_function
 
+
 def login_verified(f):
     """
     Redirects requests if the current user has not verified their login with
@@ -40,6 +44,7 @@ def login_verified(f):
         flash('You must complete your login before accessing that page.', 'info')
         return redirect(url_for('auth.log_in'))
     return decorated_function
+
 
 def sort_dict(original, parent_path=''):
     """Transforms a dict into the format Authy requires"""
@@ -74,6 +79,7 @@ def sort_dict(original, parent_path=''):
             flattened_dict = flattened_item
 
     return flattened_dict
+
 
 def verify_authy_request(f):
     """
