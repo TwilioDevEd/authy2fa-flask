@@ -1,5 +1,13 @@
 from authy import AuthyApiException
-from flask import flash, jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for
+)
 
 from . import auth
 from .forms import LoginForm, SignUpForm, VerifyForm
@@ -22,9 +30,12 @@ def sign_up():
             return redirect(url_for('main.account'))
 
         except AuthyApiException:
-            form.errors['Authy API'] = ['There was an error creating the Authy user']
+            form.errors['Authy API'] = [
+                'There was an error creating the Authy user'
+            ]
 
     return render_template('signup.html', form=form)
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def log_in():
@@ -50,13 +61,16 @@ def log_in():
                 return jsonify({'success': False})
         else:
             # The username and password weren't valid
-            form.errors['Invalid credentials'] = ['The username and password combination you entered are invalid']
+            form.errors['Invalid credentials'] = [
+                'The username and password combination you entered are invalid'
+            ]
 
     if request.method == 'POST':
-        # This was an AJAX request, and we should return our form errors as JSON
-        return jsonify({'invalid_credentials': render_template('_login_error.html', form=form)})
+        # This was an AJAX request, and we should return any errors as JSON
+        return jsonify({'invalid_credentials': render_template('_login_error.html', form=form)})  # noqa: E501
     else:
         return render_template('login.html', form=form)
+
 
 @auth.route('/authy/callback', methods=['POST'])
 @verify_authy_request
@@ -74,6 +88,7 @@ def authy_callback():
 
     return ('', 204)
 
+
 @auth.route('/login/status')
 def login_status():
     """
@@ -81,6 +96,7 @@ def login_status():
     """
     user = User.query.get(session['user_id'])
     return user.authy_status
+
 
 @auth.route('/verify', methods=['GET', 'POST'])
 @login_required
@@ -102,12 +118,15 @@ def verify():
             db.session.add(user)
             db.session.commit()
 
-            flash("You're logged in! Thanks for using two factor verification.", 'success')
+            flash("You're logged in! Thanks for using two factor verification.", 'success')  # noqa: E501
             return redirect(url_for('main.account'))
         else:
-            form.errors['verification_code'] = ['Code invalid - please try again.']
+            form.errors['verification_code'] = [
+                'Code invalid - please try again.'
+            ]
 
     return render_template('verify.html', form=form)
+
 
 @auth.route('/resend', methods=['POST'])
 @login_required
@@ -117,6 +136,7 @@ def resend():
     send_authy_token_request(user.authy_id)
     flash('I just re-sent your verification code - enter it below.', 'info')
     return redirect(url_for('auth.verify'))
+
 
 @auth.route('/logout')
 def log_out():

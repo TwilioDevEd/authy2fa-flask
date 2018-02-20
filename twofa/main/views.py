@@ -9,6 +9,7 @@ from ..models import User
 def home():
     return render_template("index.html")
 
+
 @main.route('/account')
 @login_verified
 def account():
