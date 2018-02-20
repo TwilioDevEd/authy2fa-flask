@@ -72,21 +72,14 @@ class User(db.Model):
         from .utils import get_authy_client
         client = get_authy_client()
 
-        url = '{0}/onetouch/json/users/{1}/approval_requests'.format(client.api_uri, self.authy_id)
-        data = {
-            'api_key': client.api_key,
-            'message': 'Request to log in to Twilio demo app',
-            'details[Email]': self.email
-        }
-        response = requests.post(url, data=data)
-        json_response = response.json()
+        response = client.one_touch.send_request(
+            self.authy_id,
+            'Request to log in to Twilio demo app',
+            details={'Email': self.email}
+        )
 
-        if 'approval_request' in json_response:
-            self.authy_status = 'onetouch'
-        else:
-            self.authy_status = 'sms'
+        if response.ok():
+            db.session.add(self)
+            db.session.commit()
 
-        db.session.add(self)
-        db.session.commit()
-
-        return json_response
+            return response.content
