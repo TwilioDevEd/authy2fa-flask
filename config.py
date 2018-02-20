@@ -6,7 +6,8 @@ from flask_dotenv import DotEnv
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'not-so-secret')
     AUTHY_API_KEY = os.environ.get('AUTHY_API_KEY')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('SQLALCHEMY_DATABASE_URI')
+    db_path = os.path.join(os.path.dirname(__file__), 'authy2fa.sqlite')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(db_path)
     SQLALCHEMY_TRACK_MODIFICATIONS = True
 
     @staticmethod
