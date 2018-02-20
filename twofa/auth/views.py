@@ -121,7 +121,11 @@ def resend():
 @auth.route('/logout')
 def log_out():
     """Log out a user, clearing their session variables"""
-    session.pop('user_id', None)
+    user_id = session.pop('user_id', None)
+    user = User.query.get(user_id)
+    user.authy_status = 'unverified'
+    db.session.add(user)
+    db.session.commit()
 
     flash("You're now logged out! Thanks for visiting.", 'info')
     return redirect(url_for('main.home'))
