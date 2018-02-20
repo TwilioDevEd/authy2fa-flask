@@ -1,6 +1,7 @@
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from . import db
+from .utils import authy_user_has_app, send_authy_one_touch_request
 
 
 class User(db.Model):
@@ -46,15 +47,7 @@ class User(db.Model):
 
     @property
     def has_authy_app(self):
-        # Importing here to avoid circular dependency
-        from .utils import get_authy_client
-        client = get_authy_client()
-
-        authy_user = client.users.status(self.authy_id)
-        try:
-            return authy_user.content['status']['registered']
-        except KeyError:
-            return False
+        return authy_user_has_app(self.authy_id)
 
     @password.setter
     def password(self, password):
@@ -64,19 +57,4 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def send_one_touch_request(self):
-        """Initiates an Authy OneTouch request for this user"""
-        # Importing here to avoid circular dependency
-        from .utils import get_authy_client
-        client = get_authy_client()
-
-        response = client.one_touch.send_request(
-            self.authy_id,
-            'Request to log in to Twilio demo app',
-            details={'Email': self.email}
-        )
-
-        if response.ok():
-            db.session.add(self)
-            db.session.commit()
-
-            return response.content
+        return send_authy_one_touch_request(self.authy_id, self.email)

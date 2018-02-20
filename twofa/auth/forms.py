@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, PasswordField, StringField, validators
 
+from .. import db
 from ..models import User
 
 
@@ -19,6 +20,17 @@ class SignUpForm(FlaskForm):
     password = PasswordField('Password', validators=[validators.InputRequired()])  # noqa: E501
     country_code = IntegerField('Country code', validators=[validators.InputRequired()])  # noqa: E501
     phone_number = StringField('Mobile phone', validators=[validators.InputRequired()])  # noqa: E501
+
+    def create_user(self, authy_user_id):
+        user = User(self.email.data, self.password.data, self.name.data,
+                    self.country_code.data, self.phone_number.data,
+                    authy_user_id)
+
+        # Save the user
+        db.session.add(user)
+        db.session.commit()
+        db.session.refresh(user)
+        return user
 
 
 class LoginForm(FlaskForm):
