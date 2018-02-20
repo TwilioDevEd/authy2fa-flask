@@ -89,29 +89,17 @@ def verify_authy_request(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # Get the request URL without the parameters
-        url = request.url
-        nonce = request.headers['X-Authy-Signature-Nonce']
+        from .utils import get_authy_client
+        client = get_authy_client()
 
-        # Get a string that concatenates all the POST data in case-sensitive
-        # order by key
-        sorted_data = sort_dict(request.json)
-        encoded_data = quote_plus(sorted_data, safe='/=+&%')
-
-        # Concatenate the url and the sorted parameters
-        data = nonce + '|' + request.method + '|' + url + '|' + encoded_data
-
-        # Hash it using HMAC-SHA256 and our Authy API key
-        digest = hmac.new(current_app.config['AUTHY_API_KEY'], msg=data,
-                          digestmod=hashlib.sha256).digest()
-
-        # Encode the digest in base64
-        digest_in_base64 = base64.b64encode(digest).decode()
-
-        # Confirm that our digest_in_base64 matches the one in the request's
-        # X-Authy-Signature header
-        authy_signature = request.headers['X-Authy-Signature']
-
-        if digest_in_base64 == authy_signature:
+        response = client.one_touch.validate_one_touch_signature(
+            request.headers['X-Authy-Signature'],
+            request.headers['X-Authy-Signature-Nonce'],
+            request.method,
+            request.url,
+            request.json
+        )
+        if response:
             # The two signatures match - this request is authentic
             return f(*args, **kwargs)
 
