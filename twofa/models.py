@@ -47,6 +47,18 @@ class User(db.Model):
     def password(self):
         raise AttributeError('password is not readable')
 
+    @property
+    def has_authy_app(self):
+        # Importing here to avoid circular dependency
+        from .utils import get_authy_client
+        client = get_authy_client()
+
+        authy_user = client.users.status(self.authy_id)
+        try:
+            return authy_user.content['status']['registered']
+        except KeyError:
+            return False
+
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)

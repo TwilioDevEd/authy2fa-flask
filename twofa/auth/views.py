@@ -42,10 +42,12 @@ def log_in():
         if user is not None and user.verify_password(form.password.data):
             session['user_id'] = user.id
 
-            # Send a request to verify this user's login with OneTouch
-            one_touch_response = user.send_one_touch_request()
-
-            return jsonify(one_touch_response)
+            if user.has_authy_app:
+                # Send a request to verify this user's login with OneTouch
+                one_touch_response = user.send_one_touch_request()
+                return jsonify(one_touch_response)
+            else:
+                return jsonify({'success': False})
         else:
             # The username and password weren't valid
             form.errors['Invalid credentials'] = ['The username and password combination you entered are invalid']
