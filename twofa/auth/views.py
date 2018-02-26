@@ -21,8 +21,8 @@ def sign_up():
 
             return redirect(url_for('main.account'))
 
-        except AuthyApiException:
-            form.errors['Authy API'] = ['There was an error creating the Authy user']
+        except AuthyApiException as e:
+            form.errors['Authy API'] = ['There was an error creating the Authy user', e.msg]
 
     return render_template('signup.html', form=form)
 
@@ -63,14 +63,17 @@ def authy_callback():
     authy_id = request.json.get('authy_id')
     # When you're configuring your Endpoint/URL under OneTouch settings '1234'
     # is the preset 'authy_id'
-    if authy_id != '1234':
-        user = User.query.filter_by(authy_id=authy_id).one()
+    if str(authy_id) != '1234':
+        user = User.query.filter_by(authy_id=authy_id).first()
 
-        user.authy_status = request.json.get('status')
-        db.session.add(user)
-        db.session.commit()
+        if user:
+            user.authy_status = request.json.get('status')
+            db.session.add(user)
+            db.session.commit()
+        else:
+            return ('', 404)
 
-    return ('', 204)
+    return ('', 200)
 
 @auth.route('/login/status')
 def login_status():

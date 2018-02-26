@@ -1,4 +1,5 @@
 from authy.api import AuthyApiClient
+from authy import AuthyApiException
 from flask import current_app
 
 from . import db
@@ -29,7 +30,9 @@ def create_user(form):
         db.session.add(user)
         db.session.commit()
         db.session.refresh(user)
-    return user
+        return user
+    else:
+        raise AuthyApiException('', '', authy_user.errors()['message'])
 
 def send_authy_token_request(authy_user_id):
     """
