@@ -14,6 +14,7 @@ def create_app(config_name):
 
     Bootstrap(app)
     db.init_app(app)
+    db.create_all(app=app)
 
     from .auth import auth as auth_blueprint
     app.register_blueprint(auth_blueprint)
