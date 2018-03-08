@@ -48,12 +48,6 @@ and the SQlite3 database.
 
 1. Copy the `.env_example` file to `.env`, and edit it to include your Authy App's Production API key
 
-1. Run the migrations.
-
-    ```
-    ./manage.py db upgrade
-    ```
-
 1. Start the development server.
 
     ```
