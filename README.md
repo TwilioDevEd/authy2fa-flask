@@ -72,8 +72,6 @@ http://88b37ada.ngrok.io/authy/callback
 
 You can run the tests locally through [coverage](http://coverage.readthedocs.org/):
 
-1. Optionally create a separate test database and update your `DATABASE_URL` environment variable if you don't want your development data overwritten.
-
 1. Run the tests.
 
     ```

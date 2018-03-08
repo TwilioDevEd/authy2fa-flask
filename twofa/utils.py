@@ -1,5 +1,6 @@
 from authy.api import AuthyApiClient
 from flask import current_app
+from authy import AuthyApiException
 
 
 def get_authy_client():
@@ -20,6 +21,8 @@ def create_user(form):
     # with the same information + the Authy user's id
     if authy_user.ok():
         return form.create_user(authy_user.id)
+    else:
+        raise AuthyApiException('', '', authy_user.errors()['message'])
 
 
 def send_authy_token_request(authy_user_id):
@@ -63,8 +66,7 @@ def verify_authy_token(authy_user_id, user_entered_code):
 def authy_user_has_app(authy_user_id):
     """Verifies a user has the Authy app installed"""
     client = get_authy_client()
-
-    authy_user = client.authy_client.users.status(authy_user_id)
+    authy_user = client.users.status(authy_user_id)
     try:
         return authy_user.content['status']['registered']
     except KeyError:

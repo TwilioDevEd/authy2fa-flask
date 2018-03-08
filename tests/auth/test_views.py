@@ -9,6 +9,14 @@ class ViewsTestCase(unittest.TestCase):
     def setUp(self):
         self.app = create_app('testing')
         self.client = self.app.test_client()
+        self.user = User(
+            'test@example.com',
+            'fakepassword',
+            'test',
+            33,
+            '611223344',
+            1234
+        )
         db.create_all()
 
     def tearDown(self):
@@ -37,9 +45,7 @@ class ViewsTestCase(unittest.TestCase):
         fake_client.users.create.assert_called()
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(resp.location, 'http://localhost/account')
-        print(User.query.all())
 
-        user = User.query.filter_by(email='test@example.com').first()
-        self.assertEqual(user.full_name, 'test')
-        self.assertEqual(user.country_code, 33)
-        self.assertEqual(user.phone_number, '611223344')
+        self.assertEqual(self.user.full_name, 'test')
+        self.assertEqual(self.user.country_code, 33)
+        self.assertEqual(self.user.phone, '611223344')

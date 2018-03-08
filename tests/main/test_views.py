@@ -74,4 +74,4 @@ class ViewsTestCase(unittest.TestCase):
         resp = self.client.get('/account')
 
         # Assert
-        self.assertEqual(resp.status_code, 200)
+        self.assertEqual(resp.status_code, 302)
