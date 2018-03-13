@@ -2,7 +2,10 @@ import unittest
 
 from twofa import create_app, db
 from twofa.models import User
-from unittest.mock import patch
+try:
+    from unittest.mock import patch
+except ImportError:
+    from mock import patch
 
 
 class UserTestCase(unittest.TestCase):

@@ -2,7 +2,10 @@ import unittest
 
 from twofa import create_app, db
 from twofa.models import User
-from unittest.mock import patch, MagicMock, PropertyMock
+try:
+    from unittest.mock import patch, MagicMock, PropertyMock
+except ImportError:
+    from mock import patch, MagicMock, PropertyMock
 
 
 class ViewsTestCase(unittest.TestCase):
