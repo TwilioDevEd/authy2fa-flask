@@ -10,7 +10,7 @@ Flask-SQLAlchemy==2.3.2
 Flask-WTF==0.14.2
 
 # Other libraries
-authy==2.1.5
+authy==2.2.2
 requests==2.18.4
 
 # Production server
