@@ -1,9 +1,7 @@
-from flask import current_app
 from werkzeug.security import generate_password_hash, check_password_hash
 
-import requests
-
 from . import db
+from .utils import authy_user_has_app, send_authy_one_touch_request
 
 
 class User(db.Model):
@@ -47,6 +45,10 @@ class User(db.Model):
     def password(self):
         raise AttributeError('password is not readable')
 
+    @property
+    def has_authy_app(self):
+        return authy_user_has_app(self.authy_id)
+
     @password.setter
     def password(self, password):
         self.password_hash = generate_password_hash(password)
@@ -55,26 +57,4 @@ class User(db.Model):
         return check_password_hash(self.password_hash, password)
 
     def send_one_touch_request(self):
-        """Initiates an Authy OneTouch request for this user"""
-        # Importing here to avoid circular dependency
-        from .utils import get_authy_client
-        client = get_authy_client()
-
-        url = '{0}/onetouch/json/users/{1}/approval_requests'.format(client.api_uri, self.authy_id)
-        data = {
-            'api_key': client.api_key,
-            'message': 'Request to log in to Twilio demo app',
-            'details[Email]': self.email
-        }
-        response = requests.post(url, data=data)
-        json_response = response.json()
-
-        if 'approval_request' in json_response:
-            self.authy_status = 'onetouch'
-        else:
-            self.authy_status = 'sms'
-
-        db.session.add(self)
-        db.session.commit()
-
-        return json_response
+        return send_authy_one_touch_request(self.authy_id, self.email)

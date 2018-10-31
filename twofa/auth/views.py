@@ -1,5 +1,13 @@
 from authy import AuthyApiException
-from flask import flash, jsonify, redirect, render_template, request, session, url_for
+from flask import (
+    flash,
+    jsonify,
+    redirect,
+    render_template,
+    request,
+    session,
+    url_for
+)
 
 from . import auth
 from .forms import LoginForm, SignUpForm, VerifyForm
@@ -21,10 +29,14 @@ def sign_up():
 
             return redirect(url_for('main.account'))
 
-        except AuthyApiException:
-            form.errors['Authy API'] = ['There was an error creating the Authy user']
+        except AuthyApiException as e:
+            form.errors['Authy API'] = [
+                'There was an error creating the Authy user',
+                e.msg
+            ]
 
     return render_template('signup.html', form=form)
+
 
 @auth.route('/login', methods=['GET', 'POST'])
 def log_in():
@@ -42,19 +54,24 @@ def log_in():
         if user is not None and user.verify_password(form.password.data):
             session['user_id'] = user.id
 
-            # Send a request to verify this user's login with OneTouch
-            one_touch_response = user.send_one_touch_request()
-
-            return jsonify(one_touch_response)
+            if user.has_authy_app:
+                # Send a request to verify this user's login with OneTouch
+                one_touch_response = user.send_one_touch_request()
+                return jsonify(one_touch_response)
+            else:
+                return jsonify({'success': False})
         else:
             # The username and password weren't valid
-            form.errors['Invalid credentials'] = ['The username and password combination you entered are invalid']
+            form.errors['Invalid credentials'] = [
+                'The username and password combination you entered are invalid'
+            ]
 
     if request.method == 'POST':
-        # This was an AJAX request, and we should return our form errors as JSON
-        return jsonify({'invalid_credentials': render_template('_login_error.html', form=form)})
+        # This was an AJAX request, and we should return any errors as JSON
+        return jsonify({'invalid_credentials': render_template('_login_error.html', form=form)})  # noqa: E501
     else:
         return render_template('login.html', form=form)
+
 
 @auth.route('/authy/callback', methods=['POST'])
 @verify_authy_request
@@ -63,14 +80,18 @@ def authy_callback():
     authy_id = request.json.get('authy_id')
     # When you're configuring your Endpoint/URL under OneTouch settings '1234'
     # is the preset 'authy_id'
-    if authy_id != '1234':
+    if authy_id != 1234:
         user = User.query.filter_by(authy_id=authy_id).one()
+
+        if not user:
+            return ('', 404)
 
         user.authy_status = request.json.get('status')
         db.session.add(user)
         db.session.commit()
 
-    return ('', 204)
+    return ('', 200)
+
 
 @auth.route('/login/status')
 def login_status():
@@ -79,6 +100,7 @@ def login_status():
     """
     user = User.query.get(session['user_id'])
     return user.authy_status
+
 
 @auth.route('/verify', methods=['GET', 'POST'])
 @login_required
@@ -100,12 +122,15 @@ def verify():
             db.session.add(user)
             db.session.commit()
 
-            flash("You're logged in! Thanks for using two factor verification.", 'success')
+            flash("You're logged in! Thanks for using two factor verification.", 'success')  # noqa: E501
             return redirect(url_for('main.account'))
         else:
-            form.errors['verification_code'] = ['Code invalid - please try again.']
+            form.errors['verification_code'] = [
+                'Code invalid - please try again.'
+            ]
 
     return render_template('verify.html', form=form)
+
 
 @auth.route('/resend', methods=['POST'])
 @login_required
@@ -116,10 +141,15 @@ def resend():
     flash('I just re-sent your verification code - enter it below.', 'info')
     return redirect(url_for('auth.verify'))
 
+
 @auth.route('/logout')
 def log_out():
     """Log out a user, clearing their session variables"""
-    session.pop('user_id', None)
+    user_id = session.pop('user_id', None)
+    user = User.query.get(user_id)
+    user.authy_status = 'unverified'
+    db.session.add(user)
+    db.session.commit()
 
     flash("You're now logged out! Thanks for visiting.", 'info')
     return redirect(url_for('main.home'))
