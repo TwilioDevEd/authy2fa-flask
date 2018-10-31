@@ -11,7 +11,7 @@ Flask-WTF==0.14.2
 
 # Other libraries
 authy==2.2.2
-requests==2.19.1
+requests>=2.20.0
 
 # Production server
 gunicorn==19.9.0
