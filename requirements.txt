@@ -1,7 +1,7 @@
 # Requirements for authy2fa-flask
 
 # Flask + assorted extensions
-Flask==1.0.2
+Flask==1.1.1
 Flask-Bootstrap==3.3.7.1
 Flask-DotEnv==0.1.1
 Flask-Migrate==2.2.1
