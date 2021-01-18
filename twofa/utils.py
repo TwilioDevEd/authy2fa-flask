@@ -13,9 +13,9 @@ def create_user(form):
     client = get_authy_client()
 
     # Create a new Authy user with the data from our form
-    authy_user = client.users.create(form.email.data,
-                                     form.phone_number.data,
-                                     form.country_code.data)
+    authy_user = client.users.create(
+        form.email.data, form.phone_number.data, form.country_code.data
+    )
 
     # If the Authy user was created successfully, create a local User
     # with the same information + the Authy user's id
@@ -44,9 +44,7 @@ def send_authy_one_touch_request(authy_user_id, email=None):
         details['Email'] = email
 
     response = client.one_touch.send_request(
-        authy_user_id,
-        'Request to log in to Twilio demo app',
-        details=details
+        authy_user_id, 'Request to log in to Twilio demo app', details=details
     )
 
     if response.ok():
@@ -57,10 +55,7 @@ def verify_authy_token(authy_user_id, user_entered_code):
     """Verifies a user-entered token with Authy"""
     client = get_authy_client()
 
-    return client.tokens.verify(
-        authy_user_id,
-        user_entered_code
-    )
+    return client.tokens.verify(authy_user_id, user_entered_code)
 
 
 def authy_user_has_app(authy_user_id):

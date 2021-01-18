@@ -1,17 +1,9 @@
 from authy import AuthyApiException
-from flask import (
-    flash,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for
-)
+from flask import flash, jsonify, redirect, render_template, request, session, url_for
 
 from . import auth
 from .forms import LoginForm, SignUpForm, VerifyForm
-from .. import db
+from ..database import db
 from ..decorators import login_required, verify_authy_request
 from ..models import User
 from ..utils import create_user, send_authy_token_request, verify_authy_token
@@ -32,7 +24,7 @@ def sign_up():
         except AuthyApiException as e:
             form.errors['Authy API'] = [
                 'There was an error creating the Authy user',
-                e.msg
+                e.msg,
             ]
 
     return render_template('signup.html', form=form)
@@ -62,13 +54,15 @@ def log_in():
                 return jsonify({'success': False})
         else:
             # The username and password weren't valid
-            form.errors['Invalid credentials'] = [
+            form.email.errors.append(
                 'The username and password combination you entered are invalid'
-            ]
+            )
 
     if request.method == 'POST':
         # This was an AJAX request, and we should return any errors as JSON
-        return jsonify({'invalid_credentials': render_template('_login_error.html', form=form)})  # noqa: E501
+        return jsonify(
+            {'error': render_template('_login_error.html', form=form)}
+        )  # noqa: E501
     else:
         return render_template('login.html', form=form)
 
@@ -122,12 +116,12 @@ def verify():
             db.session.add(user)
             db.session.commit()
 
-            flash("You're logged in! Thanks for using two factor verification.", 'success')  # noqa: E501
+            flash(
+                "You're logged in! Thanks for using two factor verification.", 'success'
+            )  # noqa: E501
             return redirect(url_for('main.account'))
         else:
-            form.errors['verification_code'] = [
-                'Code invalid - please try again.'
-            ]
+            form.errors['verification_code'] = ['Code invalid - please try again.']
 
     return render_template('verify.html', form=form)
 

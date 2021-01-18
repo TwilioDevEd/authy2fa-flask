@@ -1,19 +1,10 @@
-import unittest
-
-from twofa import create_app, db
+from twofa import db
 from twofa.models import User
 
+from ..base import BaseTestCase
 
-class ViewsTestCase(unittest.TestCase):
-    def setUp(self):
-        self.app = create_app('testing')
-        self.client = self.app.test_client()
-        db.create_all()
 
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
-
+class ViewsTestCase(BaseTestCase):
     def test_home(self):
         # Act
         resp = self.client.get('/')
@@ -21,7 +12,7 @@ class ViewsTestCase(unittest.TestCase):
         # Assert
         self.assertEqual(resp.status_code, 200)
 
-    def test_account_as_anon(self):
+    def test_account_as_anonymous(self):
         # Act
         resp = self.client.get('/account')
 
@@ -38,7 +29,7 @@ class ViewsTestCase(unittest.TestCase):
             33,
             600112233,
             123,
-            authy_status='unverified'
+            authy_status='unverified',
         )
         db.session.add(user)
         db.session.commit()
@@ -53,7 +44,7 @@ class ViewsTestCase(unittest.TestCase):
         self.assertEqual(resp.status_code, 302)
         self.assertEqual(resp.location, 'http://localhost/login')
 
-    def test_account_as_authentified(self):
+    def test_account_as_verified(self):
         # Arrange
         user = User(
             'example@example.com',
@@ -62,7 +53,7 @@ class ViewsTestCase(unittest.TestCase):
             33,
             600112233,
             123,
-            authy_status='approved'
+            authy_status='approved',
         )
         db.session.add(user)
         db.session.commit()
@@ -74,4 +65,4 @@ class ViewsTestCase(unittest.TestCase):
         resp = self.client.get('/account')
 
         # Assert
-        self.assertEqual(resp.status_code, 302)
+        self.assertEqual(resp.status_code, 200)
