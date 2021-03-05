@@ -2,16 +2,16 @@ $(document).ready(function() {
 
   $('#login-form').submit(function(e) {
     e.preventDefault();
-    formData = $(e.currentTarget).serialize();
+    const formData = $(e.currentTarget).serialize();
     attemptOneTouchVerification(formData);
   });
 
-  var attemptOneTouchVerification = function(form) {
+  const attemptOneTouchVerification = function(form) {
     $.post( "/login", form, function(data) {
+      $('.form-errors').remove();
       // Check first if we successfully authenticated the username and password
-      if (data.hasOwnProperty('invalid_credentials')) {
-        $('.form-errors').remove();
-        $('#login-form').prepend(data.invalid_credentials);
+      if (data.hasOwnProperty('error')) {
+        $('#login-form').prepend(data.error);
         return;
       }
 
@@ -25,12 +25,12 @@ $(document).ready(function() {
     });
   };
 
-  var checkForOneTouch = function() {
+  const checkForOneTouch = function() {
     $.get( "/login/status", function(data) {
       
-      if (data == 'approved') {
+      if (data === 'approved') {
         window.location.href = "/account";
-      } else if (data == 'denied') {
+      } else if (data === 'denied') {
         redirectToTokenForm();
       } else {
         setTimeout(checkForOneTouch, 2000);
@@ -38,7 +38,7 @@ $(document).ready(function() {
     });
   };
 
-  var redirectToTokenForm = function() {
+  const redirectToTokenForm = function() {
     window.location.href = "/verify";
   };
 });

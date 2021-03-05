@@ -1,44 +1,26 @@
-import unittest
+from unittest.mock import patch
 
-from twofa import create_app, db
 from twofa.models import User
-try:
-    from unittest.mock import patch
-except ImportError:
-    from mock import patch
+
+from .base import BaseTestCase
 
 
-class UserTestCase(unittest.TestCase):
+class UserTestCase(BaseTestCase):
     def setUp(self):
-        self.app = create_app('testing')
         self.user = User(
-            'example@example.com',
-            'fakepassword',
-            'Alice',
-            33,
-            600112233,
-            123
+            'example@example.com', 'fakepassword', 'Alice', 33, 600112233, 123
         )
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
 
     def test_has_authy_app(self):
-        # Arrange
-
-        # Act
+        # Arrange / Act
         with patch('twofa.models.authy_user_has_app', return_value=True):
             has_authy_app = self.user.has_authy_app
 
         # Assert
         self.assertTrue(has_authy_app)
 
-    def test_hasnt_authy_app(self):
-        # Arrange
-
-        # Act
+    def test_has_not_authy_app(self):
+        # Arrange / Act
         with patch('twofa.models.authy_user_has_app', return_value=False):
             has_authy_app = self.user.has_authy_app
 
@@ -46,8 +28,6 @@ class UserTestCase(unittest.TestCase):
         self.assertFalse(has_authy_app)
 
     def test_password_is_unreadable(self):
-        # Arrange
-
         # Act / Assert
         with self.assertRaises(AttributeError):
             self.user.password

@@ -1,30 +1,15 @@
-import unittest
+from unittest.mock import patch, MagicMock, PropertyMock
 
-from twofa import create_app, db
+from ..base import BaseTestCase
 from twofa.models import User
-try:
-    from unittest.mock import patch, MagicMock, PropertyMock
-except ImportError:
-    from mock import patch, MagicMock, PropertyMock
 
 
-class ViewsTestCase(unittest.TestCase):
+class ViewsTestCase(BaseTestCase):
     def setUp(self):
-        self.app = create_app('testing')
-        self.client = self.app.test_client()
+        super().setUp()
         self.user = User(
-            'test@example.com',
-            'fakepassword',
-            'test',
-            33,
-            '611223344',
-            1234
+            'test@example.com', 'fakepassword', 'test', 33, '611223344', 1234
         )
-        db.create_all()
-
-    def tearDown(self):
-        db.session.remove()
-        db.drop_all()
 
     def test_sign_up(self):
         # Arrange
@@ -36,13 +21,16 @@ class ViewsTestCase(unittest.TestCase):
 
         # Act
         with patch('twofa.utils.get_authy_client', return_value=fake_client):
-            resp = self.client.post('/sign-up', data={
-                'name': 'test',
-                'email': 'test@example.com',
-                'password': 'fakepassword',
-                'country_code': 33,
-                'phone_number': '611223344'
-            })
+            resp = self.client.post(
+                '/sign-up',
+                data={
+                    'name': 'test',
+                    'email': 'test@example.com',
+                    'password': 'fakepassword',
+                    'country_code': 33,
+                    'phone_number': '611223344',
+                },
+            )
 
         # Assert
         fake_client.users.create.assert_called()

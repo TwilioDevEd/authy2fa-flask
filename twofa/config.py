@@ -1,35 +1,31 @@
 import os
 
-from flask_dotenv import DotEnv
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-class Config:
+class DefaultConfig:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'not-so-secret')
     AUTHY_API_KEY = os.environ.get('AUTHY_API_KEY')
     db_path = os.path.join(os.path.dirname(__file__), 'authy2fa.sqlite')
     SQLALCHEMY_DATABASE_URI = 'sqlite:///{}'.format(db_path)
     SQLALCHEMY_TRACK_MODIFICATIONS = True
+    DEBUG = False
 
-    @staticmethod
-    def init_app(app):
-        env = DotEnv()
-        env.init_app(app)
 
-class DevelopmentConfig(Config):
+class DevelopmentConfig(DefaultConfig):
     DEBUG = True
 
-class TestingConfig(Config):
+
+class TestingConfig(DefaultConfig):
     TESTING = True
     WTF_CSRF_ENABLED = False
     SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
 
-class ProductionConfig(Config):
-    DEBUG = False
 
-config = {
+config_classes = {
     'development': DevelopmentConfig,
     'testing': TestingConfig,
-    'production': ProductionConfig,
-
-    'default': DevelopmentConfig
+    'production': DefaultConfig,
 }
