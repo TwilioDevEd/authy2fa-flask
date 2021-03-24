@@ -1,4 +1,4 @@
-alembic==1.4.3
+alembic==1.5.8
 appdirs==1.4.4
 authy==2.2.6
 black==20.8b1
