@@ -7,7 +7,7 @@ chardet==4.0.0
 click==7.1.2
 coverage==5.3.1
 dominate==2.6.0
-flake8==3.8.4
+flake8==3.9.1
 Flask==1.1.2
 Flask-Bootstrap==3.3.7.1
 Flask-Migrate==2.5.3
