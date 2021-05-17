@@ -10,7 +10,7 @@ dominate==2.6.0
 flake8==3.8.4
 Flask==1.1.2
 Flask-Bootstrap==3.3.7.1
-Flask-Migrate==2.5.3
+Flask-Migrate==3.0.0
 Flask-SQLAlchemy==2.4.4
 Flask-WTF==0.14.3
 gunicorn==20.0.4
